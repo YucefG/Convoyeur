@@ -265,5 +265,11 @@ void detect_eject(void)
         marche_avant_s(40.0, true, false, true);
 
 	}
+	else
+	{
+		turn_90(-600);
+		marche_avant_s(40.0, true, false, true);
+	}
+
 
 }
