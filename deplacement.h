@@ -8,6 +8,7 @@
 //Defines optimises deconseille de modifier
 #define ACCELERATION_MAX				500.0f		//a calculer (float)
 #define MAX_VITESSE						1100
+#define VITESSE_INTERM					500
 #define SEUIL_VIT_NUL	  				40
 #define DELTA_T_MS						5	
 #define DELTA_T_S						0.005	
@@ -40,7 +41,7 @@ void turn_90(int16_t speed);
 void init_pos_mot(void);
 void init_vitesse_mot(void);
 void trajet_rectiligne(float objectif, bool demarrage_s, bool freinage_s, bool charge);
-void marche_avant_s(float objectif, bool demarrage_s, bool freinage_s, bool charge);
+void marche_avant_s(float objectif, bool demarrage_s, bool freinage_s, bool charge, bool zone_bornes, bool b_portes);
 void marche_avant(int16_t speed);
 void detect_eject(void);
 

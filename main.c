@@ -18,6 +18,7 @@
 #include <deplacement.h>
 #include <fcts_maths.h>
 #include <detection.h>
+#include <analyse_couleur.h>
 
 
 
@@ -147,37 +148,63 @@ int main(void)
             {
                 //tests: 
                 //marche avant avec accel et frein controles
-                marche_avant_s(30.0,  false, true, true);          //detec de la plateforme ou y a le colis
+
+            	init_vitesse_mot();
+            	init_pos_mot();
+            	marche_avant_s(12.0,  true, true, true, false, false);          //detec de la plateforme ou y a le colis
                 
-                chThdSleepMilliseconds(400); 
                 init_vitesse_mot();
                 init_pos_mot();
-                marche_avant_s(-30.0, false, true, true);            //charge pour faire tomber lobjet
+                chThdSleepMilliseconds(400);
+
+                marche_avant_s(-12.0, true, true, true, false, false);            //charge pour faire tomber lobjet
                 
-                chThdSleepMilliseconds(400); 
+                init_vitesse_mot();
+                init_pos_mot();
+                chThdSleepMilliseconds(400);
+
+
+                turn_90(-500);
+
                 init_vitesse_mot();
                 init_pos_mot();
 
-                marche_avant_s(-30.0, true, false, true);
+                marche_avant_s(50.0, true, true, true, false, true);
+                detect_eject();
+
+                init_vitesse_mot();
+                init_pos_mot();
+
+                turn_90(-600);
+
+                marche_avant_s(-40.0, true, true, true, false, true);
+
+
+
+
+
+
+
+          /*      marche_avant_s(30.0, true, false, true, false);
                 
                 chThdSleepMilliseconds(400); 
                 init_vitesse_mot();
                 init_pos_mot();
-                marche_avant_s(-30.0, true, false, true);
+                marche_avant_s(-30.0, true, false, true, false);
                 
                 chThdSleepMilliseconds(400); 
                 init_vitesse_mot();
                 init_pos_mot();
-                marche_avant_s(30.0, true, true, false);
+                marche_avant_s(30.0, true, true, false, false);
                 
                 chThdSleepMilliseconds(400); 
                 init_vitesse_mot();
                 init_pos_mot();
-                marche_avant_s(-30.0, true, true, false);
+                marche_avant_s(-30.0, true, true, false, false);
                 
                 chThdSleepMilliseconds(400); 
                 init_vitesse_mot();
-                init_pos_mot(); 
+                init_pos_mot(); */
             }            
     	}
 
@@ -191,7 +218,7 @@ int main(void)
         {
             chprintf((BaseSequentialStream *)&SD3, "DANS LE SELECT 15");
 
-            while(detection_porte())
+            while(detection_porte(true))
             {
             	marche_avant(600);
             	palSetPad(GPIOD, GPIOD_LED3);
@@ -211,8 +238,14 @@ int main(void)
 
         if((get_selector()==14))
         {
-        	marche_avant_s(30.0,  false, true, true);
+        	init_vitesse_mot();
+        	init_pos_mot();
+        	marche_avant_s(50.0, true, true, true, false, true);
         	detect_eject();
+            while(1)
+            {
+                
+            }
         }
 
 

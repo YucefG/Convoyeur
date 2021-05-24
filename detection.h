@@ -46,7 +46,7 @@
 
 
 bool prox_distance(bool charge);
-bool detection_porte(void);
+bool detection_porte(bool b_portes);
 
 
 

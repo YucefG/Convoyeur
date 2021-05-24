@@ -22,9 +22,9 @@ float MmToCm(uint16_t ValeurMm)
 	return (float)((float)ValeurMm)/((float)DIX);
 }
 
-int16_t CmToSteps(float ValeurCm)
+int32_t CmToSteps(float ValeurCm)
 {
-	return (int16_t)((int16_t)ValeurCm*TICS_1_TOUR)/((int16_t)PERIM_ROUE_CM);
+	return (int32_t)((int32_t)ValeurCm*TICS_1_TOUR)/((int32_t)PERIM_ROUE_CM);
 }
 
 int16_t Distance_to_temps(float objectif, float acceleration, float delta_t)

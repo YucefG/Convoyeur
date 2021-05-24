@@ -105,18 +105,29 @@ void init_vitesse_mot(void)
 * 	
 *	
 *	
-*	
+*	si zone_bornes = true, on impose vitesse faible, sinon vitesse max
 */
-void marche_avant_s(float objectif, bool demarrage_s, bool freinage_s, bool charge)
+void marche_avant_s(float objectif, bool demarrage_s, bool freinage_s, bool charge, bool zone_bornes, bool b_portes)
 {
+	chprintf((BaseSequentialStream *)&SD3, "   tics au compteur: %i  ",right_motor_get_pos());
+	chprintf((BaseSequentialStream *)&SD3, "   tics objectif : %i  ",CmToSteps(objectif));
+	chprintf((BaseSequentialStream *)&SD3, "   sens : %i  ",right_motor_get_pos()<CmToSteps(objectif));
+
+
+
 	onRoad = 1 ; //a mettre a 1 avant chaque while de cette fonction
 	bool sens = (right_motor_get_pos()<CmToSteps(objectif)) ; // true si avant, false si arriere
 	//calcul de l'acceleration
 	int16_t v_a_max =0;
-	int16_t v_dec_max =0;
+	int16_t vitesse_palier =0 ;
+	if(zone_bornes)
+		vitesse_palier = VITESSE_INTERM;
+	else
+		vitesse_palier = MAX_VITESSE;
 	vitesse_prec = 0;
 	//on calcule le nb de tics pour une pente dacc 0->vit max avec acc = max autorise
-	int16_t tics_rampe = MAX_VITESSE/ACCELERATION_MAX; 
+	float temps_rampe = (float)vitesse_palier/ACCELERATION_MAX; 
+	int16_t tics_rampe = (0.5)*ACCELERATION_MAX*(float)temps_rampe*(float)temps_rampe;
 	
 	//partage en 3 zones de vitesse, zone ascendante, constante, descendante
 	int16_t tics1 = tics_rampe;
@@ -145,32 +156,28 @@ void marche_avant_s(float objectif, bool demarrage_s, bool freinage_s, bool char
 
 	systime_t time = 0;
 	time = chVTGetSystemTime(); 
-//	chprintf((BaseSequentialStream *)&SD3, "   tics rampe: %i  ",tics_rampe);
 
-//	chprintf((BaseSequentialStream *)&SD3, "   tics objectif : %i  ",CmToSteps(objectif));
 
-	while((abs(right_motor_get_pos())<tics1) && onRoad && prox_distance(charge) && detection_porte())
+	while((abs(right_motor_get_pos())<tics1) && onRoad && prox_distance(charge) && detection_porte(b_portes))
 	{
 
 		if(sens)
 		{
-			v_a_max = vitesse_prec + ACCELERATION_MAX*(4.0);
+			v_a_max = vitesse_prec + ACCELERATION_MAX*((4.0)*(0.001));
 		}
 		else
 		{
-			v_a_max = vitesse_prec - ACCELERATION_MAX*(4.0);
+			v_a_max = vitesse_prec - ACCELERATION_MAX*((4.0)*(0.001));
 		}
 		vitesse_prec = v_a_max;
-	//	chprintf((BaseSequentialStream *)&SD3, "   delta t: %u  ",chVTGetSystemTime()-time);
 		time = chVTGetSystemTime();
 		marche_avant(vitesse_prec);
 		chThdSleepMilliseconds(4);	
 		chprintf((BaseSequentialStream *)&SD3, "   direction: %i  ",sens);
 	}
-	//	chprintf((BaseSequentialStream *)&SD3, "   prox: %i  ",prox_distance(charge));
 
-	while(abs(right_motor_get_pos())<(abs(CmToSteps(objectif))-tics3)
-			&& prox_distance(charge) && onRoad detection_porte())
+	while((abs(right_motor_get_pos())+3)<(abs(CmToSteps(objectif))-tics3)
+			&& prox_distance(charge) && onRoad && detection_porte(b_portes))
 	{
 		palClearPad(GPIOD, GPIOD_LED1);
 		palClearPad(GPIOD, GPIOD_LED3);
@@ -178,16 +185,17 @@ void marche_avant_s(float objectif, bool demarrage_s, bool freinage_s, bool char
 		palClearPad(GPIOD, GPIOD_LED7);		
 		if(sens)
 		{
-			marche_avant(MAX_VITESSE);
-			vitesse_prec = MAX_VITESSE;
+			marche_avant(vitesse_palier);
+			vitesse_prec = vitesse_palier;
 		}
 		else
 		{
-			marche_avant(-MAX_VITESSE);
-			vitesse_prec = -MAX_VITESSE;
+			marche_avant(-vitesse_palier);
+			vitesse_prec = -vitesse_palier;
 		}	
-			chprintf((BaseSequentialStream *)&SD3, "   direction: %i  ",sens);
-						chprintf((BaseSequentialStream *)&SD3, "   VITESSE MAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAX ");
+		chprintf((BaseSequentialStream *)&SD3, "   direction: %i  ",sens);
+		chprintf((BaseSequentialStream *)&SD3, "   VITESSE PALIER");
+
 
 
 	}
@@ -205,39 +213,35 @@ void marche_avant_s(float objectif, bool demarrage_s, bool freinage_s, bool char
 		compteur++;
 		if(sens)
 		{
-			v_a_max = vitesse_prec - ACCELERATION_MAX*(4.0);
+			v_a_max = vitesse_prec - ACCELERATION_MAX*((4.0)*(0.001));
 			if(v_a_max<0)
 				onRoad = 0;;
 		}
 		else
 		{
-			v_a_max = vitesse_prec + ACCELERATION_MAX*(4.0);
+			v_a_max = vitesse_prec + ACCELERATION_MAX*((4.0)*(0.001));
 			if(v_a_max>-0)
 				onRoad = 0;
 		}
-		chprintf((BaseSequentialStream *)&SD3, "   diff de vitesse : %i  ",vitesse_prec - v_a_max);
 
 		vitesse_prec = v_a_max;
-	//	chprintf((BaseSequentialStream *)&SD3, "   delta t: %u  ",chVTGetSystemTime()-time);
-
-	//	chprintf((BaseSequentialStream *)&SD3, "   vitesse_prec: %i  ",vitesse_prec);
 		time = chVTGetSystemTime();
 		marche_avant(vitesse_prec);
 		chThdSleepMilliseconds(4);
-	//		chprintf((BaseSequentialStream *)&SD3, "   direction: %i  ",sens);
+//			chprintf((BaseSequentialStream *)&SD3, "   direction: %i  ",sens);
 	}
 
-	chprintf((BaseSequentialStream *)&SD3, "   compteur : %i  ",compteur);
+//	chprintf((BaseSequentialStream *)&SD3, "   compteur : %i  ",compteur);
 
-
+	chprintf((BaseSequentialStream *)&SD3, "   direction: %i  ",sens);
 	chprintf((BaseSequentialStream *)&SD3, "   tics rampe: %i  ",tics_rampe);
 	chprintf((BaseSequentialStream *)&SD3, "   tics1: %i  ",tics1);
 	chprintf((BaseSequentialStream *)&SD3, "   tics3: %i  ",tics3);
 	chprintf((BaseSequentialStream *)&SD3, "   tics au compteur: %i  ",right_motor_get_pos());
-
 	chprintf((BaseSequentialStream *)&SD3, "   tics objectif : %i  ",CmToSteps(objectif));
+	
 	init_vitesse_mot();
-	chThdSleepMilliseconds(5000);
+//	chThdSleepMilliseconds(1000);
 
 }
 
@@ -257,19 +261,26 @@ void marche_avant(int16_t speed)
 
 void detect_eject(void)
 {
+	init_pos_mot();
 	turn_90(-600);
-	if(detect_rouge())
+	chThdSleepMilliseconds(1000);
+	if(detec_rouge())
 	{
+		init_pos_mot();
 		turn_90(600);
-		turn_90(-600);
-        marche_avant_s(40.0, true, false, true);
-
+		init_pos_mot();
+		turn_90(600);
+		init_pos_mot();
+        marche_avant_s(20.0, true, false, true, false, false);
+    	init_pos_mot();
+        marche_avant_s(-20.0, false, true, true, false, false);
 	}
 	else
 	{
-		turn_90(-600);
-		marche_avant_s(40.0, true, false, true);
+		init_pos_mot();
+		turn_90(600);
+		init_pos_mot();
+		marche_avant_s(-40.0, true, false, true, false, false);
 	}
-
-
 }
+

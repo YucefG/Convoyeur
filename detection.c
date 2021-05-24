@@ -13,11 +13,9 @@
 #include <audio/play_melody.h>
 #include <sensors/VL53L0X/VL53L0X.h>
 #include <detection.h>
-#include <analyse_couleur.h>
 
-#define UN			1
-#define DEUX		2
 
+//
 _Bool prox_distance(bool charge)
 {
 	/* Si les capteurs de proximite situes a un angle de 17° ont atteint la limite de collision
@@ -34,18 +32,19 @@ _Bool prox_distance(bool charge)
 		return true;
 }
 
-bool detection_porte(void)
+//b_portes est true si on fait attention aux portes, false sinon
+bool detection_porte(bool b_portes)
 {
-	bool porte = true;
-
-	// S'il l'objet passe a travers une porte il met porte a false
-	if((get_calibrated_prox(PROX_FRONT_R49)!=0) && (get_calibrated_prox(PROX_FRONT_L49)!=0))
-		porte = false;
+	if(b_portes)
+	{
+		// S'il l'objet passe a travers une porte il met porte a false
+		if((get_calibrated_prox(PROX_R)>20) && (get_calibrated_prox(PROX_L)>20))
+			return false;
+		else
+			return true;
+	}
 	else
-		porte = true;
-
-	return porte;
+		return true;
 }
-
 
 

@@ -65,7 +65,7 @@ static THD_FUNCTION(ProcessImage, arg){
 
 	uint8_t *img_buff_ptr;
 	uint8_t image_r[IMAGE_BUFFER_SIZE] = {0};	//tableau pour la couleur rouge
-	uint8_t image_b[IMAGE_BUFFER_SIZE] = {0};	//tableau pour la couleur bleue
+//	uint8_t image_b[IMAGE_BUFFER_SIZE] = {0};	//tableau pour la couleur bleue
 
     while(1){
     	//waits until an image has been captured
@@ -75,11 +75,11 @@ static THD_FUNCTION(ProcessImage, arg){
 
 		for(uint16_t i=0; i<2*IMAGE_BUFFER_SIZE; i+=2)
 		{
-			image_b[i/2] = (uint8_t)img_buff_ptr[i+1]&0b00011111; //bleu
+//			image_b[i/2] = (uint8_t)img_buff_ptr[i+1]&0b00011111; //bleu
 			image_r[i/2] = (uint8_t)img_buff_ptr[i]&0xF8; //rouge
 		}
 		moyenne_r = moyenne_ligne(image_r);
-		moyenne_b = moyenne_ligne(image_b);
+//		moyenne_b = moyenne_ligne(image_b);
     }
 }
 
