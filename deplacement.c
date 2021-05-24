@@ -12,6 +12,8 @@
 #include <sensors/proximity.h>
 #include <audio/play_melody.h>
 #include <selector.h>
+#include <analyse_couleur.h>
+
 
 #include <detection.h>
 #include <deplacement.h>
@@ -251,4 +253,17 @@ void marche_avant(int16_t speed)
 	right_motor_set_speed(speed);
 	lumiere_eteinte();		
 	palClearPad(GPIOD, GPIOD_LED1);	 
+}
+
+void detect_eject(void)
+{
+	turn_90(-600);
+	if(detect_rouge())
+	{
+		turn_90(600);
+		turn_90(-600);
+        marche_avant_s(40.0, true, false, true);
+
+	}
+
 }

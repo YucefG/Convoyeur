@@ -203,15 +203,16 @@ int main(void)
         }
         
         /*
-        *  Selecteur == 5 :
+        *  Selecteur == 14 :
         *  
         *  
         *  
         */
 
-        if((get_selector()==5))
+        if((get_selector()==14))
         {
-           
+        	marche_avant_s(30.0,  false, true, true);
+        	detect_eject();
         }
 
 

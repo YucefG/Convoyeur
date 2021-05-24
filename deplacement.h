@@ -42,6 +42,7 @@ void init_vitesse_mot(void);
 void trajet_rectiligne(float objectif, bool demarrage_s, bool freinage_s, bool charge);
 void marche_avant_s(float objectif, bool demarrage_s, bool freinage_s, bool charge);
 void marche_avant(int16_t speed);
+void detect_eject(void);
 
 
 #endif /* DEPLACEMENT_H */

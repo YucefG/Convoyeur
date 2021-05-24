@@ -13,7 +13,10 @@
 #include <audio/play_melody.h>
 #include <sensors/VL53L0X/VL53L0X.h>
 #include <detection.h>
+#include <analyse_couleur.h>
 
+#define UN			1
+#define DEUX		2
 
 _Bool prox_distance(bool charge)
 {

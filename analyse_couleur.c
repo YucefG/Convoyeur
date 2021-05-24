@@ -12,7 +12,7 @@
 
 
 static uint16_t moyenne_r = 0;
-static uint16_t moyenne_b = 0;
+//static uint16_t moyenne_b = 0;
 
 //Semaphore
 static BSEMAPHORE_DECL(image_ready_sem, TRUE);
