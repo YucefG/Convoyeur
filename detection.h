@@ -46,6 +46,8 @@
 
 
 bool prox_distance(bool charge);
+bool detection_porte(void);
+
 
 
 #endif /* MESURE_H */

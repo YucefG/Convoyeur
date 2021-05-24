@@ -181,14 +181,20 @@ int main(void)
     	}
 
         /*
-        *  Selecteur == 4 :
+        *  Selecteur == 15 :
         *  
         * 
         *   
         */
-        if(get_selector()==4)
+        if(get_selector()==15)
         {
+            while(detection_porte())
+            {
+            	marche_avant(600);
+            }
             
+            if(detection_porte() == false)
+            	marche_avant(0);
         }
         
         /*

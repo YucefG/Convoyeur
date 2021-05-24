@@ -31,5 +31,18 @@ _Bool prox_distance(bool charge)
 		return true;
 }
 
+bool detection_porte(void)
+{
+	bool porte = true;
+
+	// S'il l'objet passe a travers une porte il met porte a false
+	if((get_calibrated_prox(PROX_FRONT_R49)!=0) && (get_calibrated_prox(PROX_FRONT_L49)!=0))
+		porte = false;
+	else
+		porte = true;
+
+	return porte;
+}
+
 
 
