@@ -147,7 +147,7 @@ void marche_avant_s(float objectif, bool demarrage_s, bool freinage_s, bool char
 
 //	chprintf((BaseSequentialStream *)&SD3, "   tics objectif : %i  ",CmToSteps(objectif));
 
-	while((abs(right_motor_get_pos())<tics1) && onRoad && prox_distance(charge))
+	while((abs(right_motor_get_pos())<tics1) && onRoad && prox_distance(charge) && detection_porte())
 	{
 
 		if(sens)
@@ -167,7 +167,8 @@ void marche_avant_s(float objectif, bool demarrage_s, bool freinage_s, bool char
 	}
 	//	chprintf((BaseSequentialStream *)&SD3, "   prox: %i  ",prox_distance(charge));
 
-	while(abs(right_motor_get_pos())<(abs(CmToSteps(objectif))-tics3) && prox_distance(charge) && onRoad)
+	while(abs(right_motor_get_pos())<(abs(CmToSteps(objectif))-tics3)
+			&& prox_distance(charge) && onRoad detection_porte())
 	{
 		palClearPad(GPIOD, GPIOD_LED1);
 		palClearPad(GPIOD, GPIOD_LED3);
