@@ -17,6 +17,7 @@
 #include <arm_math.h>
 #include <deplacement.h>
 #include <fcts_maths.h>
+#include <detection.h>
 
 
 
@@ -188,13 +189,17 @@ int main(void)
         */
         if(get_selector()==15)
         {
+            chprintf((BaseSequentialStream *)&SD3, "DANS LE SELECT 15");
+
             while(detection_porte())
             {
             	marche_avant(600);
+            	palSetPad(GPIOD, GPIOD_LED3);
+            	palSetPad(GPIOD, GPIOD_LED7);
             }
-            
-            if(detection_porte() == false)
-            	marche_avant(0);
+            palClearPad(GPIOD, GPIOD_LED3);
+            palClearPad(GPIOD, GPIOD_LED7);
+            marche_avant(0);
         }
         
         /*
