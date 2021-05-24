@@ -6,7 +6,7 @@
 #define VITESSE_ROTA_ANGLES				200
 
 //Defines optimises deconseille de modifier
-#define ACCELERATION_MAX				0.5f		//a calculer (float)
+#define ACCELERATION_MAX				500.0f		//a calculer (float)
 #define MAX_VITESSE						1100
 #define SEUIL_VIT_NUL	  				40
 #define DELTA_T_MS						5	
