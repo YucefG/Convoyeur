@@ -388,6 +388,20 @@ void detect_eject(void)
 		marche_avant_s(-40.0, true, false, true, false, false);
 	}
 }
+
+void detect_recup(void)
+{
+	init_pos_mot();
+	rotation_s(-90.0);
+	chThdSleepMilliseconds(1000);
+	if(detection_couleur())
+	{
+		init_pos_mot();
+		rotation_s(180.0)
+
+
+	}
+}
 /* Cette fonction permet au robot de bien se centrer
  * afin de recuperer l'objet de maniere parfaite sur sa tete
  * */

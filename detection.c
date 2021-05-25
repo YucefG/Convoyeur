@@ -49,22 +49,12 @@ bool detection_porte(bool b_portes)
 		return true;
 }
 
-uint8_t detection_objet_recup(void)
+uint8_t detection_couleur(void)
 {
-	numero_couleur = 0;
+	uint8_t numero_couleur = 0;
 
 	init_vitesse_mot();
 	init_pos_mot();
-	// regarde le drapeau a 45° qui indique la couleur de l'objet recupere
-	rotation_s(45.0);
 
-	if(detec_rouge)
-		return numero_couleur = 0;
-	else
-		return numero_couleur = 1;
-
-	init_vitesse_mot();
-	init_pos_mot();
-	rotation_s(-45.0);
 }
 
