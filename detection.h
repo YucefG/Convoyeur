@@ -47,6 +47,7 @@
 
 
 bool prox_distance(bool charge);
+bool detection_balise(bool b_balise);
 bool detection_porte(bool b_portes);
 uint8_t detection_couleur(void);
 

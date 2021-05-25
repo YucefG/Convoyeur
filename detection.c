@@ -35,6 +35,21 @@ _Bool prox_distance(bool charge)
 }
 
 //b_portes est true si on fait attention aux portes, false sinon
+bool detection_balise(bool b_balise)
+{
+	if(b_balise)
+	{
+		// S'il l'objet passe a travers une porte il met porte a false
+		if(get_calibrated_prox(PROX_L)>20)
+			return false;
+		else
+			return true;
+	}
+	else
+		return true;
+}
+
+//b_portes est true si on fait attention aux portes, false sinon
 bool detection_porte(bool b_portes)
 {
 	if(b_portes)

@@ -34,6 +34,8 @@ float dist_acc =ZERO;
 static uint8_t compte_d = ZERO;
 static uint8_t compte_g = ZERO;
 
+
+
 int16_t pi_regulator(float distance, float goal)
 {
 	float error = 0;
@@ -112,7 +114,7 @@ void init_vitesse_mot(void)
 *	
 *	si zone_bornes = true, on impose vitesse faible, sinon vitesse max
 */
-void marche_avant_s(float objectif, bool demarrage_s, bool freinage_s, bool charge, bool zone_bornes, bool b_portes)
+void marche_avant_s(float objectif, bool demarrage_s, bool freinage_s, bool charge, bool zone_bornes, bool b_balise)
 {
 	chprintf((BaseSequentialStream *)&SD3, "   tics au compteur: %i  ",right_motor_get_pos());
 	chprintf((BaseSequentialStream *)&SD3, "   tics objectif : %i  ",CmToSteps(objectif));
@@ -138,8 +140,6 @@ void marche_avant_s(float objectif, bool demarrage_s, bool freinage_s, bool char
 	int16_t tics1 = tics_rampe;
 	int16_t tics3 = tics_rampe;
 
-
-
 	//objectif trop court pour atteindre vit max
 	//risque de probleme si objectif trop court pour une seule rampe PLUS un des deux bool est fals; probleme de vitesse 
 	if((abs(CmToSteps(objectif))<(tics1+tics3))&&(demarrage_s==true)&&(freinage_s==true))
@@ -163,7 +163,7 @@ void marche_avant_s(float objectif, bool demarrage_s, bool freinage_s, bool char
 	time = chVTGetSystemTime(); 
 
 
-	while((abs(right_motor_get_pos())<tics1) && onRoad && prox_distance(charge) && detection_porte(b_portes))
+	while((abs(right_motor_get_pos())<tics1) && onRoad && prox_distance(charge) && detection_balise(b_balise))
 	{
 
 		if(sens)
@@ -182,7 +182,7 @@ void marche_avant_s(float objectif, bool demarrage_s, bool freinage_s, bool char
 	}
 
 	while((abs(right_motor_get_pos())+3)<(abs(CmToSteps(objectif))-tics3)
-			&& prox_distance(charge) && onRoad && detection_porte(b_portes))
+			&& prox_distance(charge) && onRoad && detection_balise(b_balise))
 	{
 		palClearPad(GPIOD, GPIOD_LED1);
 		palClearPad(GPIOD, GPIOD_LED3);
@@ -399,7 +399,7 @@ void detect_recup(void)
 	if(detection_couleur())
 	{
 		init_pos_mot();
-		rotation_s(180.0)
+		rotation_s(180.0);
 
 
 	}
@@ -452,3 +452,14 @@ void re_axage(void)
 		}
 }
 
+void next_balise(void)
+{
+	init_pos_mot();
+	init_vitesse_mot();
+	float temps_rampe = (float)VITESSE_INTERM/ACCELERATION_MAX; 
+	int16_t tics_rampe = (0.5)*ACCELERATION_MAX*(float)temps_rampe*(float)temps_rampe;
+	marche_avant_s(50.0,true,true,true,true,true);
+	marche_avant_s(-StepsToCm(tics_rampe),true,true,true,true,false);
+	init_pos_mot();
+	init_vitesse_mot();
+}

@@ -41,7 +41,7 @@ void turn_90(int16_t speed);
 void init_pos_mot(void);
 void init_vitesse_mot(void);
 void trajet_rectiligne(float objectif, bool demarrage_s, bool freinage_s, bool charge);
-void marche_avant_s(float objectif, bool demarrage_s, bool freinage_s, bool charge, bool zone_bornes, bool b_portes);
+void marche_avant_s(float objectif, bool demarrage_s, bool freinage_s, bool charge, bool zone_bornes, bool b_balise);
 void rotation_s(float angle);
 void tourner(int16_t speed);
 void marche_avant(int16_t speed);
@@ -49,6 +49,7 @@ void detect_eject(void);
 void detect_recup(void);
 void axage(void);
 void re_axage(void);
+void next_balise(void); 
 
 
 
