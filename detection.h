@@ -48,7 +48,7 @@
 
 bool prox_distance(bool charge);
 bool detection_porte(bool b_portes);
-uint8_t detection_objet_recup(void);
+uint8_t detection_couleur(void);
 
 
 #endif /* MESURE_H */

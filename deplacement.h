@@ -46,8 +46,10 @@ void rotation_s(float angle);
 void tourner(int16_t speed);
 void marche_avant(int16_t speed);
 void detect_eject(void);
+void detect_recup(void);
 void axage(void);
 void re_axage(void);
+
 
 
 #endif /* DEPLACEMENT_H */
