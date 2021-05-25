@@ -20,7 +20,7 @@
 #define SEUIL_VIT_NUL_PI				40
 #define COEFF_MM_2_STEPS				100/13
 #define COEFFSTEPSCM					100
-#define PERIM_ROUE_CM					13
+#define PERIM_ROUE_CM					13.0f
 
 //Constantes arbitraires
 #define MARCHE_AVANT 					true
@@ -42,6 +42,8 @@ void init_pos_mot(void);
 void init_vitesse_mot(void);
 void trajet_rectiligne(float objectif, bool demarrage_s, bool freinage_s, bool charge);
 void marche_avant_s(float objectif, bool demarrage_s, bool freinage_s, bool charge, bool zone_bornes, bool b_portes);
+void rotation_s(float angle);
+void tourner(int16_t speed);
 void marche_avant(int16_t speed);
 void detect_eject(void);
 

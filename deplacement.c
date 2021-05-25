@@ -245,6 +245,100 @@ void marche_avant_s(float objectif, bool demarrage_s, bool freinage_s, bool char
 
 }
 
+/*
+* 	
+*	
+*	
+*	si zone_bornes = true, on impose vitesse faible, sinon vitesse max
+*/
+void rotation_s(float angle)
+{
+	onRoad = 1 ; //a mettre a 1 avant chaque while de cette fonction
+	float objectif = angle_to_arc(angle,D_ENTRE_ROUES_CM);
+	bool sens = (right_motor_get_pos()<CmToSteps(objectif)) ; // true si avant, false si arriere
+	//calcul de l'acceleration
+	int16_t v_a_max =0;
+	int16_t vitesse_palier =0 ;
+	vitesse_palier = VITESSE_INTERM;
+	vitesse_prec = 0;
+	//on calcule le nb de tics pour une pente dacc 0->vit max avec acc = max autorise
+	float temps_rampe = (float)vitesse_palier/ACCELERATION_MAX; 
+	int16_t tics_rampe = (0.5)*ACCELERATION_MAX*(float)temps_rampe*(float)temps_rampe;
+	
+	//partage en 3 zones de vitesse, zone ascendante, constante, descendante
+	int16_t tics1 = tics_rampe;
+	int16_t tics3 = tics_rampe;
+
+	//objectif trop court pour atteindre vit max
+	//risque de probleme si objectif trop court pour une seule rampe PLUS un des deux bool est fals; probleme de vitesse 
+	if((abs(CmToSteps(objectif))<(tics1+tics3)))
+	{
+		tics1 = abs(CmToSteps(objectif) / 2);
+		tics3 = abs(CmToSteps(objectif) / 2);
+	}
+
+//	systime_t time = 0;
+//	time = chVTGetSystemTime(); 
+	while((abs(right_motor_get_pos())<tics1) && onRoad)
+	{
+		if(sens)
+		{
+			v_a_max = vitesse_prec + ACCELERATION_MAX*((4.0)*(0.001));
+		}
+		else
+		{
+			v_a_max = vitesse_prec - ACCELERATION_MAX*((4.0)*(0.001));
+		}
+		vitesse_prec = v_a_max;
+//		time = chVTGetSystemTime();
+		tourner(vitesse_prec);
+		chThdSleepMilliseconds(4);	
+	}
+
+	while((abs(right_motor_get_pos()))<(abs(CmToSteps(objectif))-tics3) && onRoad)
+	{	
+		if(sens)
+		{
+			tourner(vitesse_palier);
+			vitesse_prec = vitesse_palier;
+		}
+		else
+		{
+			tourner(-vitesse_palier);
+			vitesse_prec = -vitesse_palier;
+		}	
+	}
+	int compteur =0;
+
+	while(abs(right_motor_get_pos())<(abs(CmToSteps(objectif))) && onRoad)
+	{
+		compteur++;
+		if(sens)
+		{
+			v_a_max = vitesse_prec - ACCELERATION_MAX*((4.0)*(0.001));
+			if(v_a_max<0)
+				onRoad = 0;;
+		}
+		else
+		{
+			v_a_max = vitesse_prec + ACCELERATION_MAX*((4.0)*(0.001));
+			if(v_a_max>-0)
+				onRoad = 0;
+		}
+		vitesse_prec = v_a_max;
+//		time = chVTGetSystemTime();
+		tourner(vitesse_prec);
+		chThdSleepMilliseconds(4);
+	}
+	init_vitesse_mot();
+	chprintf((BaseSequentialStream *)&SD3, "   direction: %i  ",sens);
+	chprintf((BaseSequentialStream *)&SD3, "   tics rampe: %i  ",tics_rampe);
+	chprintf((BaseSequentialStream *)&SD3, "   tics1: %i  ",tics1);
+	chprintf((BaseSequentialStream *)&SD3, "   tics3: %i  ",tics3);
+	chprintf((BaseSequentialStream *)&SD3, "   tics au compteur: %i  ",right_motor_get_pos());
+	chprintf((BaseSequentialStream *)&SD3, "   tics objectif : %i  ",CmToSteps(objectif));
+}
+
 
 /*
 * 	Donne la meme vitesse aux de ux moteurs pour aller tout droit, en avant ou en arriere
@@ -257,6 +351,12 @@ void marche_avant(int16_t speed)
 	right_motor_set_speed(speed);
 	lumiere_eteinte();		
 	palClearPad(GPIOD, GPIOD_LED1);	 
+}
+
+void tourner(int16_t speed)
+{
+	left_motor_set_speed(speed);
+	right_motor_set_speed(-speed);
 }
 
 void detect_eject(void)

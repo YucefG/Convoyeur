@@ -10,6 +10,8 @@
 #include <stdint.h>
 #include <deplacement.h>
 #include <detection.h>
+#include <arm_math.h>
+
 
 
 float StepsToCm(int32_t nbSteps)
@@ -24,7 +26,7 @@ float MmToCm(uint16_t ValeurMm)
 
 int32_t CmToSteps(float ValeurCm)
 {
-	return (int32_t)((int32_t)ValeurCm*TICS_1_TOUR)/((int32_t)PERIM_ROUE_CM);
+	return (int32_t)((ValeurCm*(float)TICS_1_TOUR)/PERIM_ROUE_CM);
 }
 
 int16_t Distance_to_temps(float objectif, float acceleration, float delta_t)
@@ -36,3 +38,7 @@ int16_t Distance_to_temps(float objectif, float acceleration, float delta_t)
 	return (uint16_t)(temps/delta_t);
 } 
 
+float angle_to_arc(float angle, float diametre)
+{
+	return angle*(PI/ANGLE360)*diametre; 
+}

@@ -216,17 +216,25 @@ int main(void)
         */
         if(get_selector()==15)
         {
-            chprintf((BaseSequentialStream *)&SD3, "DANS LE SELECT 15");
+            
+            rotation_s(180.0);
+            init_vitesse_mot();
+            init_pos_mot();
+            chThdSleepMilliseconds(3000);
+            rotation_s(180.0);
+            init_vitesse_mot();
+            init_pos_mot();
+            chThdSleepMilliseconds(3000);
 
-            while(detection_porte(true))
-            {
-            	marche_avant(600);
-            	palSetPad(GPIOD, GPIOD_LED3);
-            	palSetPad(GPIOD, GPIOD_LED7);
-            }
-            palClearPad(GPIOD, GPIOD_LED3);
-            palClearPad(GPIOD, GPIOD_LED7);
-            marche_avant(0);
+             rotation_s(360.0);
+            init_vitesse_mot();
+            init_pos_mot();
+            chThdSleepMilliseconds(3000);
+            rotation_s(-360.0);
+            init_vitesse_mot();
+            init_pos_mot();
+            chThdSleepMilliseconds(3000);
+
         }
         
         /*

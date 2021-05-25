@@ -2,8 +2,9 @@
 #define MESURE_H
 
 //Defines du hardware non modifiable
-#define ANGLE360				360
+#define ANGLE360				360.0f 
 #define D_ENTRE_ROUES			53			//en mm
+#define D_ENTRE_ROUES_CM		5.3f			//en cm
 #define TICS_1_TOUR				1000
 #define DISTANCE_1_TOUR			130			//en mm
 #define OFFSET					30
