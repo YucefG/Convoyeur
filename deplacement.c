@@ -396,11 +396,50 @@ void detect_recup(void)
 	init_pos_mot();
 	rotation_s(-90.0);
 	chThdSleepMilliseconds(1000);
-	if(detection_couleur())
+	if(detec_rouge())
 	{
 		init_pos_mot();
 		rotation_s(180.0);
+		init_pos_mot();
+        marche_avant_s(40.0, true, false, false, false, false);
+        //permet de revenir d'exactement la bonne distance
+    	memoire = right_motor_get_pos();
+    	memoire = StepsToCm(memoire);
 
+    	//intialise les moteurs avant de s'axer devant l'objet
+    	init_vitesse_mot();
+        init_pos_mot();
+        axage();
+
+        //initialise les moteurs avant d'avancer de 2cm
+        init_vitesse_mot();
+        init_pos_mot();
+        marche_avant_s(2.0,  true, true, true, false, false);
+
+        //initialise les moteurs avant de reculer de 2cm
+        init_vitesse_mot();
+        init_pos_mot();
+        chThdSleepMilliseconds(400);
+        marche_avant_s(-2.0,  true, true, true, false, false);
+
+        //initialise les moteurs avant de se desaxer
+        init_vitesse_mot();
+        init_pos_mot();
+        chThdSleepMilliseconds(400);
+        re_axage();
+
+
+        //initialise les moteurs avant de faire marche arriere
+         init_vitesse_mot();
+         init_pos_mot();
+         chThdSleepMilliseconds(400);
+         marche_avant_s(-memoire, false, true, true, false, false);
+
+         //initialise les moteurs avant de partir en direction de la poubelle
+         init_vitesse_mot();
+         init_pos_mot();
+         chThdSleepMilliseconds(400);
+         rotation_s(-90.0);
 
 	}
 }

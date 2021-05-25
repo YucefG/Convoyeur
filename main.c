@@ -149,44 +149,10 @@ int main(void)
                 //tests: 
                 //marche avant avec accel et frein controles
 
-            	init_vitesse_mot();
-            	init_pos_mot();
-            	marche_avant_s(30.0,  true, true, false, false, false);
-                init_vitesse_mot();
-                init_pos_mot();
-            	axage();
-                init_vitesse_mot();
-                init_pos_mot();
-            	marche_avant_s(2.0,  true, true, true, false, false);
+            	detect_recup();
 
                 init_vitesse_mot();
                 init_pos_mot();
-                chThdSleepMilliseconds(400);
-
-                marche_avant_s(-2.0,  true, true, true, false, false);
-
-                init_vitesse_mot();
-                init_pos_mot();
-                chThdSleepMilliseconds(400);
-
-                re_axage();
-
-                init_vitesse_mot();
-                init_pos_mot();
-                chThdSleepMilliseconds(400);
-
-                marche_avant_s(-12.0, true, true, true, false, false);            //charge pour faire tomber lobjet
-                
-                init_vitesse_mot();
-                init_pos_mot();
-                chThdSleepMilliseconds(400);
-
-
-                rotation_s(-90.0);
-
-                init_vitesse_mot();
-                init_pos_mot();
-
                 marche_avant_s(20.0, true, true, true, false, true);
                 detect_eject();
 
