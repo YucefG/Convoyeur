@@ -13,6 +13,8 @@
 #include <audio/play_melody.h>
 #include <sensors/VL53L0X/VL53L0X.h>
 #include <detection.h>
+#include <deplacement.h>
+#include <analyse_couleur.h>
 
 
 //
@@ -47,4 +49,22 @@ bool detection_porte(bool b_portes)
 		return true;
 }
 
+uint8_t detection_objet_recup(void)
+{
+	numero_couleur = 0;
+
+	init_vitesse_mot();
+	init_pos_mot();
+	// regarde le drapeau a 45° qui indique la couleur de l'objet recupere
+	rotation_s(45.0);
+
+	if(detec_rouge)
+		return numero_couleur = 0;
+	else
+		return numero_couleur = 1;
+
+	init_vitesse_mot();
+	init_pos_mot();
+	rotation_s(-45.0);
+}
 

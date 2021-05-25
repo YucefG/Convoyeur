@@ -369,7 +369,7 @@ void detect_eject(void)
 	init_pos_mot();
 	turn_90(-600);
 	chThdSleepMilliseconds(1000);
-	if(detec_rouge())
+	if(detec_rouge() && detection_objet_recup()==0)
 	{
 		init_pos_mot();
 		turn_90(600);
@@ -417,4 +417,22 @@ void axage(void)
 		}
 }
 
+void re_axage(void)
+{
+	while(compte_d != ZERO)
+		{
+			chThdSleepMilliseconds(CENT);
+			left_motor_set_speed(-CENT);
+			right_motor_set_speed(CENT);
+			compte_d --;
+		}
+
+		while(compte_g != ZERO)
+		{
+			chThdSleepMilliseconds(CENT);
+			left_motor_set_speed(CENT);
+			right_motor_set_speed(-CENT);
+			compte_g --;
+		}
+}
 
