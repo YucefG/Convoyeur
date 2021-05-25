@@ -151,13 +151,25 @@ int main(void)
 
             	init_vitesse_mot();
             	init_pos_mot();
-            	marche_avant_s(10.0,  true, true, true, false, false);
+            	marche_avant_s(30.0,  true, true, false, false, false);
                 init_vitesse_mot();
                 init_pos_mot();
             	axage();
                 init_vitesse_mot();
                 init_pos_mot();
             	marche_avant_s(2.0,  true, true, true, false, false);
+
+                init_vitesse_mot();
+                init_pos_mot();
+                chThdSleepMilliseconds(400);
+
+                marche_avant_s(-2.0,  true, true, true, false, false);
+
+                init_vitesse_mot();
+                init_pos_mot();
+                chThdSleepMilliseconds(400);
+
+                re_axage();
 
                 init_vitesse_mot();
                 init_pos_mot();
@@ -170,7 +182,7 @@ int main(void)
                 chThdSleepMilliseconds(400);
 
 
-                turn_90(-500);
+                rotation_s(-90.0);
 
                 init_vitesse_mot();
                 init_pos_mot();
@@ -181,7 +193,7 @@ int main(void)
                 init_vitesse_mot();
                 init_pos_mot();
 
-                turn_90(-600);
+                rotation_s(-90.0);
 
                 while(1)
                 {

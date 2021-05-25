@@ -367,25 +367,27 @@ void tourner(int16_t speed)
 void detect_eject(void)
 {
 	init_pos_mot();
-	turn_90(-600);
+	rotation_s(-90.0);
 	chThdSleepMilliseconds(1000);
-	if(detec_rouge() && detection_objet_recup()==0)
+	if(detec_rouge()) //&& detection_objet_recup()==0)
 	{
 		init_pos_mot();
-		turn_90(600);
+		rotation_s(90.0);
 		init_pos_mot();
-		turn_90(600);
+		rotation_s(90.0);
 		init_pos_mot();
-        marche_avant_s(20.0, true, false, true, false, false);
+        marche_avant_s(40.0, true, false, false, false, false);
+        //permet de revenir d'exactement la bonne distance
+    	memoire = right_motor_get_pos();
+    	memoire = StepsToCm(memoire); 
     	init_pos_mot();
-        marche_avant_s(-20.0, false, true, true, false, false);
+        marche_avant_s(-memoire, false, true, true, false, false);
 	}
 	else
 	{
 		init_pos_mot();
-		turn_90(600);
+		rotation_s(90.0);
 		init_pos_mot();
-		marche_avant_s(-40.0, true, false, true, false, false);
 	}
 }
 /* Cette fonction permet au robot de bien se centrer
