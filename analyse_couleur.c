@@ -12,7 +12,8 @@
 
 
 static uint16_t moyenne_r = 0;
-//static uint16_t moyenne_b = 0;
+static uint16_t moyenne_v = 0;
+static uint16_t moyenne_b = 0;
 
 //Semaphore
 static BSEMAPHORE_DECL(image_ready_sem, TRUE);
@@ -65,7 +66,8 @@ static THD_FUNCTION(ProcessImage, arg){
 
 	uint8_t *img_buff_ptr;
 	uint8_t image_r[IMAGE_BUFFER_SIZE] = {0};	//tableau pour la couleur rouge
-//	uint8_t image_b[IMAGE_BUFFER_SIZE] = {0};	//tableau pour la couleur bleue
+	uint8_t image_b[IMAGE_BUFFER_SIZE] = {0};	//tableau pour la couleur bleue
+	uint8_t image_v[IMAGE_BUFFER_SIZE] = {0};   //tableau pour la couleur verte
 
     while(1){
     	//waits until an image has been captured
@@ -75,11 +77,21 @@ static THD_FUNCTION(ProcessImage, arg){
 
 		for(uint16_t i=0; i<2*IMAGE_BUFFER_SIZE; i+=2)
 		{
-//			image_b[i/2] = (uint8_t)img_buff_ptr[i+1]&0b00011111; //bleu
+			image_b[i/2] = (uint8_t)img_buff_ptr[i+1]&0b00011111; //bleu
 			image_r[i/2] = (uint8_t)img_buff_ptr[i]&0xF8; //rouge
+			image_v[i/2] = (uint8_t)img_buff_ptr[i]&0x00000111; //vert
+			image_v[(i+1)/2] = (uint8_t)img_buff_ptr[i+1]&0b11100000;//vert
+
 		}
 		moyenne_r = moyenne_ligne(image_r);
-//		moyenne_b = moyenne_ligne(image_b);
+		moyenne_b = moyenne_ligne(image_b);
+		moyenne_v = moyenne_ligne(image_v);
+
+		chprintf((BaseSequentialStream *)&SD3, "  Moyenne rouge  ", moyenne_r);
+		chprintf((BaseSequentialStream *)&SD3, "  Moyenne bleu  ", moyenne_b);
+		chprintf((BaseSequentialStream *)&SD3, "  Moyenne verte  ", moyenne_v);
+
+
     }
 }
 
