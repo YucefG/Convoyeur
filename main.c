@@ -151,8 +151,14 @@ int main(void)
 
             	init_vitesse_mot();
             	init_pos_mot();
-            	marche_avant_s(12.0,  true, true, true, false, false);          //detec de la plateforme ou y a le colis
-                
+            	marche_avant_s(10.0,  true, true, true, false, false);
+                init_vitesse_mot();
+                init_pos_mot();
+            	axage();
+                init_vitesse_mot();
+                init_pos_mot();
+            	marche_avant_s(2.0,  true, true, true, false, false);
+
                 init_vitesse_mot();
                 init_pos_mot();
                 chThdSleepMilliseconds(400);
@@ -169,7 +175,7 @@ int main(void)
                 init_vitesse_mot();
                 init_pos_mot();
 
-                marche_avant_s(50.0, true, true, true, false, true);
+                marche_avant_s(20.0, true, true, true, false, true);
                 detect_eject();
 
                 init_vitesse_mot();
@@ -177,7 +183,10 @@ int main(void)
 
                 turn_90(-600);
 
-                marche_avant_s(-40.0, true, true, true, false, true);
+                while(1)
+                {
+
+                }
 
 
 

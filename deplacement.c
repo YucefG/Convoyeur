@@ -18,16 +18,21 @@
 #include <detection.h>
 #include <deplacement.h>
 
+#define ZERO					0
+#define	SEUIL_AXAGE				20
+#define CENT					100
+#define MILLE					1000
 
 //si true: deplacement permis, sinon arret
 bool onRoad = EN_CHEMIN;
 //va donner la  couleur de l'objet, impose l'acceleration, et la poubelle a viser
-uint8_t couleur_objet = 0; 
+uint8_t couleur_objet = ZERO;
 //donne une memoire temporelle sur la vitesse avant nouvelle imposee
 int16_t vitesse_prec =0;
 //distance d'acceleration attention a quand le remettre a zero, pas dans les whiles!!!
-float dist_acc =0;
-
+float dist_acc =ZERO;
+static uint8_t compte_d = ZERO;
+static uint8_t compte_g = ZERO;
 
 int16_t pi_regulator(float distance, float goal)
 {
@@ -283,4 +288,33 @@ void detect_eject(void)
 		marche_avant_s(-40.0, true, false, true, false, false);
 	}
 }
+/* Cette fonction permet au robot de bien se centrer
+ * afin de recuperer l'objet de maniere parfaite sur sa tete
+ * */
+void axage(void)
+{
+	uint8_t axage = ZERO;
+	axage = abs(get_calibrated_prox(PROX_FRONT_R17) - get_calibrated_prox(PROX_FRONT_L17));
+	chThdSleepMilliseconds(MILLE);
+	while((get_calibrated_prox(PROX_FRONT_R17) > get_calibrated_prox(PROX_FRONT_L17)) &&
+				axage > SEUIL_AXAGE)
+		{
+			// recentrer
+			chThdSleepMilliseconds(CENT);
+			left_motor_set_speed(CENT);
+			right_motor_set_speed(-CENT);
+			compte_d++;
+		}
+
+		while((get_calibrated_prox(PROX_FRONT_R17) < get_calibrated_prox(PROX_FRONT_L17)) &&
+				axage > SEUIL_AXAGE)
+		{
+			// recentrer
+			chThdSleepMilliseconds(CENT);
+			left_motor_set_speed(-CENT);
+			right_motor_set_speed(CENT);
+			compte_g ++;
+		}
+}
+
 
