@@ -233,14 +233,17 @@ int main(void)
 
         if((get_selector()==14))
         {
-        	init_vitesse_mot();
-        	init_pos_mot();
-        	marche_avant_s(50.0, true, true, true, false, true);
-        	detect_eject();
-            while(1)
-            {
-                
-            }
+        	uint8_t compteur = 0;
+        	next_balise();
+        	detect_recup(compteur)
+        	next_balise();
+        	detect_eject(detect_recup());
+        	retour_base();
+        	next_balise();
+        	detect_recup(compteur)
+        	next_balise();
+        	detect_eject(detect_recup());
+          	retour_base();
         }
 
 

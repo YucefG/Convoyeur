@@ -364,13 +364,14 @@ void tourner(int16_t speed)
 	right_motor_set_speed(-speed);
 }
 
-void detect_eject(void)
+void detect_eject(uint8_t comptage)
 {
 	init_pos_mot();
 	rotation_s(-90.0);
 	chThdSleepMilliseconds(1000);
-	if(detec_rouge()) //&& detection_objet_recup()==0)
+	if(detec_rouge() && comptage == 1) //&& detection_objet_recup()==0)
 	{
+		chprintf((BaseSequentialStream *)&SD3, "   j'ai detecté la poubelle rouge, donc compteur = : %u  ",comptage);
 		init_pos_mot();
 		rotation_s(90.0);
 		init_pos_mot();
@@ -382,6 +383,23 @@ void detect_eject(void)
     	memoire = StepsToCm(memoire); 
     	init_pos_mot();
         marche_avant_s(-memoire, false, true, true, false, false);
+        comptage = 2;
+	}
+	else if(detec_rouge()== false && comptage == 2)
+	{
+		chprintf((BaseSequentialStream *)&SD3, "   j'ai detecté la poubelle bleue, donc compteur = : %u  ",comptage);
+		init_pos_mot();
+		rotation_s(90.0);
+		init_pos_mot();
+		rotation_s(90.0);
+		init_pos_mot();
+        marche_avant_s(40.0, true, false, false, false, false)
+		//permet de revenir d'exactement la bonne distance
+		memoire = right_motor_get_pos();
+		memoire = StepsToCm(memoire);
+		init_pos_mot();
+        marche_avant_s(-memoire, false, true, true, false, false);
+        comptage = 0;
 	}
 	else
 	{
@@ -391,57 +409,152 @@ void detect_eject(void)
 	}
 }
 
-void detect_recup(void)
+uint8_t detect_recup(uint8_t compteur)
 {
+	chprintf((BaseSequentialStream *)&SD3, "  pour l'instant je n'ai rien detecte = : %u  ",compeur);
 	init_pos_mot();
 	rotation_s(-90.0);
 	chThdSleepMilliseconds(1000);
-	if(detec_rouge())
+	if(detec_rouge() && compteur == 0)
 	{
+
+		chprintf((BaseSequentialStream *)&SD3, "   j'ai detecté la balise rouge, donc compteur = : %u  ",compteur);
 		init_pos_mot();
 		rotation_s(180.0);
 		init_pos_mot();
+		// se reaxe avant de facon dans l'objet TOF
+		//axage();
+        marche_avant_s(40.0, true, false, false, true, false);
+        //permet de revenir d'exactement la bonne distance
+    	memoire = right_motor_get_pos();
+    	memoire = StepsToCm(memoire);
+
+    	if(memoire < SEUIL)
+    	{
+    		//initialise les moteurs avant de faire marche arriere
+    		 init_vitesse_mot();
+    		 init_pos_mot();
+    		 chThdSleepMilliseconds(400);
+    		 marche_avant_s(-memoire, false, true, true, false, false);
+
+            //initialise les moteurs avant de partir en direction de la poubelle
+    		 init_vitesse_mot();
+    		 init_pos_mot();
+    		 chThdSleepMilliseconds(400);
+             rotation_s(-90.0);
+    	}
+
+    	else
+    	{
+    		compteur = 1;
+
+    		//intialise les moteurs avant de s'axer devant l'objet
+			init_vitesse_mot();
+			init_pos_mot();
+			axage();
+
+			//initialise les moteurs avant d'avancer de 2cm
+			init_vitesse_mot();
+			init_pos_mot();
+			marche_avant_s(2.0,  true, true, true, false, false);
+
+			//initialise les moteurs avant de reculer de 2cm
+			init_vitesse_mot();
+			init_pos_mot();
+			chThdSleepMilliseconds(400);
+			marche_avant_s(-2.0,  true, true, true, false, false);
+
+			//initialise les moteurs avant de se desaxer
+			init_vitesse_mot();
+			init_pos_mot();
+			chThdSleepMilliseconds(400);
+			re_axage();
+
+
+			//initialise les moteurs avant de faire marche arriere
+			 init_vitesse_mot();
+			 init_pos_mot();
+			 chThdSleepMilliseconds(400);
+			 marche_avant_s(-memoire, false, true, true, false, false);
+
+			 //initialise les moteurs avant de partir en direction de la poubelle
+			 init_vitesse_mot();
+			 init_pos_mot();
+			 chThdSleepMilliseconds(400);
+			 rotation_s(-90.0);
+    	}
+	}
+
+	else if(detec_rouge() == false && compteur != 1)
+	{
+		compteur=2;
+		chprintf((BaseSequentialStream *)&SD3, "   j'ai detecté la balise bleue, donc compteur = : %u  ",comptage);
+		init_pos_mot();
+		rotation_s(180.0);
+		init_pos_mot();
+		// se reaxe avant de facon dans l'objet TOF
+		//axage();
         marche_avant_s(40.0, true, false, false, false, false);
         //permet de revenir d'exactement la bonne distance
     	memoire = right_motor_get_pos();
     	memoire = StepsToCm(memoire);
 
-    	//intialise les moteurs avant de s'axer devant l'objet
-    	init_vitesse_mot();
-        init_pos_mot();
-        axage();
+    	if(memoire < SEUIL)
+    	{
+    		//initialise les moteurs avant de faire marche arriere
+    		 init_vitesse_mot();
+    		 init_pos_mot();
+    		 chThdSleepMilliseconds(400);
+    		 marche_avant_s(-memoire, false, true, true, false, false);
 
-        //initialise les moteurs avant d'avancer de 2cm
-        init_vitesse_mot();
-        init_pos_mot();
-        marche_avant_s(2.0,  true, true, true, false, false);
+            //initialise les moteurs avant de partir en direction de la poubelle
+    		 init_vitesse_mot();
+    		 init_pos_mot();
+    		 chThdSleepMilliseconds(400);
+             rotation_s(-90.0);
+    	}
 
-        //initialise les moteurs avant de reculer de 2cm
-        init_vitesse_mot();
-        init_pos_mot();
-        chThdSleepMilliseconds(400);
-        marche_avant_s(-2.0,  true, true, true, false, false);
+    	else
+    	{
+    		compteur = 2;
 
-        //initialise les moteurs avant de se desaxer
-        init_vitesse_mot();
-        init_pos_mot();
-        chThdSleepMilliseconds(400);
-        re_axage();
+    		//intialise les moteurs avant de s'axer devant l'objet
+			init_vitesse_mot();
+			init_pos_mot();
+			axage();
+
+			//initialise les moteurs avant d'avancer de 2cm
+			init_vitesse_mot();
+			init_pos_mot();
+			marche_avant_s(2.0,  true, true, true, false, false);
+
+			//initialise les moteurs avant de reculer de 2cm
+			init_vitesse_mot();
+			init_pos_mot();
+			chThdSleepMilliseconds(400);
+			marche_avant_s(-2.0,  true, true, true, false, false);
+
+			//initialise les moteurs avant de se desaxer
+			init_vitesse_mot();
+			init_pos_mot();
+			chThdSleepMilliseconds(400);
+			re_axage();
 
 
-        //initialise les moteurs avant de faire marche arriere
-         init_vitesse_mot();
-         init_pos_mot();
-         chThdSleepMilliseconds(400);
-         marche_avant_s(-memoire, false, true, true, false, false);
+			//initialise les moteurs avant de faire marche arriere
+			 init_vitesse_mot();
+			 init_pos_mot();
+			 chThdSleepMilliseconds(400);
+			 marche_avant_s(-memoire, false, true, true, false, false);
 
-         //initialise les moteurs avant de partir en direction de la poubelle
-         init_vitesse_mot();
-         init_pos_mot();
-         chThdSleepMilliseconds(400);
-         rotation_s(-90.0);
-
+			 //initialise les moteurs avant de partir en direction de la poubelle
+			 init_vitesse_mot();
+			 init_pos_mot();
+			 chThdSleepMilliseconds(400);
+			 rotation_s(-90.0);
+    	}
 	}
+	return compteur;
 }
 /* Cette fonction permet au robot de bien se centrer
  * afin de recuperer l'objet de maniere parfaite sur sa tete
@@ -493,12 +606,32 @@ void re_axage(void)
 
 void next_balise(void)
 {
-	init_pos_mot();
-	init_vitesse_mot();
-	float temps_rampe = (float)VITESSE_INTERM/ACCELERATION_MAX; 
-	int16_t tics_rampe = (0.5)*ACCELERATION_MAX*(float)temps_rampe*(float)temps_rampe;
-	marche_avant_s(50.0,true,true,true,true,true);
-	marche_avant_s(-StepsToCm(tics_rampe),true,true,true,true,false);
-	init_pos_mot();
-	init_vitesse_mot();
+		init_pos_mot();
+		init_vitesse_mot();
+		float temps_rampe = (float)VITESSE_INTERM/ACCELERATION_MAX;
+		int16_t tics_rampe = (0.5)*ACCELERATION_MAX*(float)temps_rampe*(float)temps_rampe;
+		marche_avant_s(50.0,true,true,true,true,true);
+		marche_avant_s(-StepsToCm(tics_rampe),true,true,true,true,false);
+		init_pos_mot();
+		init_vitesse_mot();
 }
+
+void retour_base(void)
+{
+	init_pos_mot();
+	init_vitesse_mot();
+	marche_avant_s(20.0,true,true,true,false,false);
+	init_pos_mot();
+	init_vitesse_mot();
+	marche_avant_s(-2.0,  true, true, true, false, false);
+	init_pos_mot();
+	init_vitesse_mot();
+	rotation_s(180.0);
+	init_pos_mot();
+	init_vitesse_mot();
+	marche_avant_s(50.0,true,true,false,false,false);
+	init_pos_mot();
+	init_vitesse_mot();
+	marche_avant_s(50.0,false,true,true,false,true);
+}
+
