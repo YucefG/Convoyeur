@@ -51,6 +51,7 @@ void axage(void);
 void re_axage(void);
 void next_balise();
 void retour_base(void)
+void balise_to_route(bool balise_a_route);
 
 
 

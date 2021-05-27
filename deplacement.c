@@ -71,7 +71,7 @@ int16_t pi_regulator(float distance, float goal)
 		return VITESSE_NULLE;
 	}
 
-	//Ajustement de la vitesse max positive ou nÃ©gative car problÃ©mes au max du hardware
+	//Ajustement de la vitesse max positive ou négative car problémes au max du hardware
 	if(speed>MAX_VITESSE_PI)
 		speed = MAX_VITESSE_PI;
 
@@ -116,11 +116,14 @@ void init_vitesse_mot(void)
 */
 void marche_avant_s(float objectif, bool demarrage_s, bool freinage_s, bool charge, bool zone_bornes, bool b_balise)
 {
-	chprintf((BaseSequentialStream *)&SD3, "   tics au compteur: %i  ",right_motor_get_pos());
-	chprintf((BaseSequentialStream *)&SD3, "   tics objectif : %i  ",CmToSteps(objectif));
-	chprintf((BaseSequentialStream *)&SD3, "   sens : %i  ",right_motor_get_pos()<CmToSteps(objectif));
+//	chprintf((BaseSequentialStream *)&SD3, "   DANS MARCHE AVANT  ");
 
 
+//	chprintf((BaseSequentialStream *)&SD3, "   tics au compteur: %i  ",right_motor_get_pos());
+//	chprintf((BaseSequentialStream *)&SD3, "   tics objectif : %i  ",CmToSteps(objectif));
+//	chprintf((BaseSequentialStream *)&SD3, "   sens : %i  ",right_motor_get_pos()<CmToSteps(objectif));
+
+	//chThdSleepMilliseconds(5000);
 
 	onRoad = 1 ; //a mettre a 1 avant chaque while de cette fonction
 	bool sens = (right_motor_get_pos()<CmToSteps(objectif)) ; // true si avant, false si arriere
@@ -162,6 +165,12 @@ void marche_avant_s(float objectif, bool demarrage_s, bool freinage_s, bool char
 	systime_t time = 0;
 	time = chVTGetSystemTime(); 
 
+//	chprintf((BaseSequentialStream *)&SD3, "   prox_distance(charge): %i  ",prox_distance(charge));
+//	chprintf((BaseSequentialStream *)&SD3, "   detection_balise(b_balise): %i  ",detection_balise(b_balise));
+//	chprintf((BaseSequentialStream *)&SD3, "   tics1: %i  ",tics1);
+
+	//chThdSleepMilliseconds(5000);
+
 
 	while((abs(right_motor_get_pos())<tics1) && onRoad && prox_distance(charge) && detection_balise(b_balise))
 	{
@@ -178,16 +187,11 @@ void marche_avant_s(float objectif, bool demarrage_s, bool freinage_s, bool char
 		time = chVTGetSystemTime();
 		marche_avant(vitesse_prec);
 		chThdSleepMilliseconds(4);	
-		chprintf((BaseSequentialStream *)&SD3, "   direction: %i  ",sens);
 	}
 
 	while((abs(right_motor_get_pos())+3)<(abs(CmToSteps(objectif))-tics3)
 			&& prox_distance(charge) && onRoad && detection_balise(b_balise))
-	{
-		palClearPad(GPIOD, GPIOD_LED1);
-		palClearPad(GPIOD, GPIOD_LED3);
-		palClearPad(GPIOD, GPIOD_LED5);
-		palClearPad(GPIOD, GPIOD_LED7);		
+	{	
 		if(sens)
 		{
 			marche_avant(vitesse_palier);
@@ -198,8 +202,7 @@ void marche_avant_s(float objectif, bool demarrage_s, bool freinage_s, bool char
 			marche_avant(-vitesse_palier);
 			vitesse_prec = -vitesse_palier;
 		}	
-		chprintf((BaseSequentialStream *)&SD3, "   direction: %i  ",sens);
-		chprintf((BaseSequentialStream *)&SD3, "   VITESSE PALIER");
+//		chprintf((BaseSequentialStream *)&SD3, "   direction: %i  ",sens);
 
 
 
@@ -212,7 +215,7 @@ void marche_avant_s(float objectif, bool demarrage_s, bool freinage_s, bool char
 			int compteur =0;
 
 
-	chprintf((BaseSequentialStream *)&SD3, "   tics 2: : %i  ",right_motor_get_pos());
+//	chprintf((BaseSequentialStream *)&SD3, "   tics 2: : %i  ",right_motor_get_pos());
 	while(abs(right_motor_get_pos())<(abs(CmToSteps(objectif))) && prox_distance(charge) && onRoad)
 	{
 		compteur++;
@@ -220,7 +223,7 @@ void marche_avant_s(float objectif, bool demarrage_s, bool freinage_s, bool char
 		{
 			v_a_max = vitesse_prec - ACCELERATION_MAX*((4.0)*(0.001));
 			if(v_a_max<0)
-				onRoad = 0;;
+				onRoad = 0;
 		}
 		else
 		{
@@ -238,15 +241,16 @@ void marche_avant_s(float objectif, bool demarrage_s, bool freinage_s, bool char
 
 //	chprintf((BaseSequentialStream *)&SD3, "   compteur : %i  ",compteur);
 
-	chprintf((BaseSequentialStream *)&SD3, "   direction: %i  ",sens);
+	/*chprintf((BaseSequentialStream *)&SD3, "   direction: %i  ",sens);
 	chprintf((BaseSequentialStream *)&SD3, "   tics rampe: %i  ",tics_rampe);
 	chprintf((BaseSequentialStream *)&SD3, "   tics1: %i  ",tics1);
 	chprintf((BaseSequentialStream *)&SD3, "   tics3: %i  ",tics3);
 	chprintf((BaseSequentialStream *)&SD3, "   tics au compteur: %i  ",right_motor_get_pos());
-	chprintf((BaseSequentialStream *)&SD3, "   tics objectif : %i  ",CmToSteps(objectif));
-	
+	chprintf((BaseSequentialStream *)&SD3, "   tics objectif : %i  ",CmToSteps(objectif));*/
 	init_vitesse_mot();
-//	chThdSleepMilliseconds(1000);
+		//chprintf((BaseSequentialStream *)&SD3, "  FINNNNNN  ");
+
+	//chThdSleepMilliseconds(10000);
 
 }
 
@@ -336,12 +340,12 @@ void rotation_s(float angle)
 		chThdSleepMilliseconds(4);
 	}
 	init_vitesse_mot();
-	chprintf((BaseSequentialStream *)&SD3, "   direction: %i  ",sens);
-	chprintf((BaseSequentialStream *)&SD3, "   tics rampe: %i  ",tics_rampe);
-	chprintf((BaseSequentialStream *)&SD3, "   tics1: %i  ",tics1);
-	chprintf((BaseSequentialStream *)&SD3, "   tics3: %i  ",tics3);
-	chprintf((BaseSequentialStream *)&SD3, "   tics au compteur: %i  ",right_motor_get_pos());
-	chprintf((BaseSequentialStream *)&SD3, "   tics objectif : %i  ",CmToSteps(objectif));
+	//chprintf((BaseSequentialStream *)&SD3, "   direction: %i  ",sens);
+	//chprintf((BaseSequentialStream *)&SD3, "   tics rampe: %i  ",tics_rampe);
+	//chprintf((BaseSequentialStream *)&SD3, "   tics1: %i  ",tics1);
+	//chprintf((BaseSequentialStream *)&SD3, "   tics3: %i  ",tics3);
+	//chprintf((BaseSequentialStream *)&SD3, "   tics au compteur: %i  ",right_motor_get_pos());
+	//chprintf((BaseSequentialStream *)&SD3, "   tics objectif : %i  ",CmToSteps(objectif));
 }
 
 
@@ -635,3 +639,33 @@ void retour_base(void)
 	marche_avant_s(50.0,false,true,true,false,true);
 }
 
+/*
+*		si bool_a_route = truem on accelere de vit_min a vit_max
+*		fonction utilisable que en marche avant
+*/
+void balise_to_route(bool balise_a_route)
+{
+	int16_t v_a_max = 0;
+	float temps_rampe = (float)(MAX_VITESSE-VITESSE_INTERM)/ACCELERATION_MAX; 
+	int16_t tics_rampe = (0.5)*ACCELERATION_MAX*(float)temps_rampe*(float)temps_rampe+(float)VITESSE_INTERM*temps_rampe;
+	if(balise_a_route)
+		vitesse_prec = VITESSE_INTERM;
+	else
+		vitesse_prec = MAX_VITESSE;
+	init_pos_mot();
+	while(abs(right_motor_get_pos())<tics_rampe)
+	{
+
+		if(balise_a_route)
+		{
+			v_a_max = vitesse_prec + ACCELERATION_MAX*((4.0)*(0.001));
+		}
+		else
+		{
+			v_a_max = vitesse_prec - ACCELERATION_MAX*((4.0)*(0.001));
+		}
+		vitesse_prec = v_a_max;
+		marche_avant(vitesse_prec);
+		chThdSleepMilliseconds(4);	
+	}
+}
