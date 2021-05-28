@@ -75,3 +75,38 @@ void check_compteur(uint8_t compteur)
 		lumiere_clignote();
 	}
 }
+
+void jeu_de_lumiere(void)
+{
+	palClearPad(GPIOD, GPIOD_LED1);
+	palClearPad(GPIOD, GPIOD_LED5);
+
+	chThdSleepMilliseconds(100);// Regler la rapidite du jeu de lumiere
+
+    palSetPad(GPIOD, GPIOD_LED1);
+    palClearPad(GPIOD, GPIOD_LED5);
+
+    chThdSleepMilliseconds(100);
+
+	palClearPad(GPIOD, GPIOD_LED3);
+	palClearPad(GPIOD, GPIOD_LED7);
+
+	chThdSleepMilliseconds(100);
+
+    palSetPad(GPIOD, GPIOD_LED3);
+    palClearPad(GPIOD, GPIOD_LED5);
+
+    palClearPad(GPIOB, GPIOB_LED_BODY);
+    chThdSleepMilliseconds(200);
+
+     palSetPad(GPIOB, GPIOB_LED_BODY);
+     lumiere_allumee();
+
+    chThdSleepMilliseconds(200);
+   	lumiere_eteinte();
+
+   	palClearPad(GPIOB, GPIOB_LED_BODY);
+
+     palClearPad(GPIOD, GPIOD_LED1);
+     lumiere_allumee();
+ }
