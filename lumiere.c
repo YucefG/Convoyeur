@@ -18,33 +18,6 @@ void lumiere_eteinte(void)
 
 }
 
-/*
-void lumiere_demarrage(void)
-{
-
-	if(get_demarrage()==0)
-		palClearPad(GPIOD, GPIOD_LED1);
-
-	chThdSleepMilliseconds(300);// Regler la rapidite du jeu de lumiere
-	if(get_demarrage()==0){
-	    palSetPad(GPIOD, GPIOD_LED1);
-	    palClearPad(GPIOD, GPIOD_LED3);
-	}
-	chThdSleepMilliseconds(300);
-	if(get_demarrage()==0){
-	    palSetPad(GPIOD, GPIOD_LED3);
-	    palClearPad(GPIOD, GPIOD_LED5);
-	}
-	chThdSleepMilliseconds(300);
-	if(get_demarrage()==0){
-	    palSetPad(GPIOD, GPIOD_LED5);
-	    palClearPad(GPIOD, GPIOD_LED7);
-    	chThdSleepMilliseconds(300);
-	    palSetPad(GPIOD, GPIOD_LED7);
-	}
-}
-*/
-
 void lumiere_clignote(void)
 {
 	palTogglePad(GPIOD, GPIOD_LED1);

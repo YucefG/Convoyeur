@@ -46,12 +46,15 @@ void marche_avant_s(float objectif, bool demarrage_s, bool freinage_s, bool char
 void rotation_s(float angle);
 void tourner(int16_t speed);
 void marche_avant(int16_t speed);
-uint8_t detect_eject(uint8_t comptage);
+void eject_colis(bool b_eject);
+void detect_eject(uint8_t comptage);
+bool recup_colis(bool b_recup);
 uint8_t detect_recup(uint8_t compteur);
 void axage(void);
 void re_axage(void);
 void next_balise(void);
-void retour_base(void);
+void retour_base(int16_t tics_retour);
+void next_porte(int16_t speed);
 void balise_to_route(bool balise_a_route);
 
 

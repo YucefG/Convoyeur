@@ -56,9 +56,9 @@ bool detection_porte(bool b_portes)
 	{
 		// S'il l'objet passe a travers une porte il met porte a false
 		if((get_calibrated_prox(PROX_R)>20) && (get_calibrated_prox(PROX_L)>20))
-			return false;
-		else
 			return true;
+		else
+			return false;
 	}
 	else
 		return true;

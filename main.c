@@ -19,6 +19,7 @@
 #include <fcts_maths.h>
 #include <detection.h>
 #include <analyse_couleur.h>
+#include <lumiere.h>
 
 
 
@@ -87,111 +88,63 @@ int main(void)
     //		lumiere_demarrage();
             chThdSleepMilliseconds(1000);
             chprintf((BaseSequentialStream *)&SD3, "%i", Distance_to_temps(30.0, ACCELERATION_MAX, DELTA_T_S));
+            signal_fin();
 
     	}
         
-        /*
-        *  Selecteur == 1 :
-        *       Tests pour l'instant - accelerometre
-        *    
-        */
-        if(get_selector()==2)
-        {
-            init_vitesse_mot();
-            init_pos_mot();
-    //      lumiere_demarrage();
-   //         systime_t time; 
-            while(1)
-            {
-      /*          //tests: 
-                //marche avant avec accel et frein controles
-                trajet_rectiligne(20.0, true, true, true);
-                
-                chThdSleepMilliseconds(400); 
-                init_vitesse_mot();
-                init_pos_mot();
-
-                //marche avant avec acoup au demarrage et freinage controle
-                trajet_rectiligne(20.0, false, true, true); 
-
-                chThdSleepMilliseconds(400); 
-                init_vitesse_mot();
-                init_pos_mot();
-
-                //marche avant avec acoups
-                trajet_rectiligne(20.0, false, false, true); 
-                chThdSleepMilliseconds(400); 
-                init_vitesse_mot();
-                init_pos_mot();
-                
-                //marche avant avec acoup a la fin
-                trajet_rectiligne(20.0, true, false, true); 
-                chThdSleepMilliseconds(400); 
-                init_vitesse_mot();
-                init_pos_mot();*/
-
-            }
-        }
     	
-        /*
-        * Selecteur == 2:
-    	* Le robot au son  "purge" se met a analyser les objets dans son arene
-    	* et sortira uniquement les rouges.
-    	* Selecteur == 3:
-        * le robot sort tous les objets.
-        */
+
     	if(get_selector()==1)
     	{
-           
-            //boucle infinie pour la fin de la tache
+            
+
+            //tant que le robot n'est pas bloqué
+            bool colis_a_deposer = true; 
             while(1)
             {
-                //tests: 
-                //marche avant avec accel et frein controles
-
-      //      	detect_recup();
-
-                init_vitesse_mot();
-                init_pos_mot();
-                marche_avant_s(20.0, true, true, true, false, true);
-    //            detect_eject();
-
-                init_vitesse_mot();
+                int16_t tics_retour = 0;
                 init_pos_mot();
 
-                rotation_s(-90.0);
+                next_balise();
 
-                while(1)
-                {
+                tics_retour += right_motor_get_pos();
+                init_pos_mot();
+                //recuperation du colis unique
+                colis_a_deposer = recup_colis(true);
+                init_pos_mot();
+                //sortie de la zone de recuperation
+                marche_avant_s(5, true, false, true, true, false);
+                tics_retour += right_motor_get_pos();
+                init_pos_mot();
 
-                }
+                //passage par portes plus eloignement des portes
+                next_porte(VITESSE_INTERM);
+                tics_retour += right_motor_get_pos();
+                init_pos_mot();
 
-
-
-
-
-
-
-          /*      marche_avant_s(30.0, true, false, true, false);
+                balise_to_route(true);
+                tics_retour += right_motor_get_pos();
+                init_pos_mot();
                 
-                chThdSleepMilliseconds(400); 
-                init_vitesse_mot();
+                marche_avant_s(5, false, false, true, false, false);
+                tics_retour += right_motor_get_pos();
                 init_pos_mot();
-                marche_avant_s(-30.0, true, false, true, false);
-                
-                chThdSleepMilliseconds(400); 
-                init_vitesse_mot();
+
+                next_porte(MAX_VITESSE);
+                tics_retour += right_motor_get_pos();
                 init_pos_mot();
-                marche_avant_s(30.0, true, true, false, false);
-                
-                chThdSleepMilliseconds(400); 
-                init_vitesse_mot();
+
+                balise_to_route(false);
+                tics_retour += right_motor_get_pos();
                 init_pos_mot();
-                marche_avant_s(-30.0, true, true, false, false);
-                
-                chThdSleepMilliseconds(400); 
-                init_vitesse_mot();
-                init_pos_mot(); */
+                //sortie de l'autoroute
+                tics_retour += right_motor_get_pos();
+                init_pos_mot();
+                //entree dans la zone de balises
+                marche_avant_s(50.0,false,true,true,true,true);
+                tics_retour += right_motor_get_pos();
+                eject_colis(colis_a_deposer);
+                retour_base(tics_retour);
             }            
     	}
 
@@ -203,15 +156,17 @@ int main(void)
         */
         if(get_selector()==15)
         {
-            
-            balise_to_route(true);
+            marche_avant_s(10.0, true, true, true, false, false);
             init_pos_mot();
-            marche_avant_s(30, false, false, true, false, false);
+            marche_avant_s(-10.0, true, true, true, false, false);
             init_pos_mot();
-            balise_to_route(false);
+            marche_avant_s(5.0, true, true, true, false, false);
             init_pos_mot();
-            marche_avant_s(50.0,false,true,true,true,true);
-
+            marche_avant_s(-5.0, true, true, true, false, false);
+            init_pos_mot();
+            marche_avant_s(2.0, true, true, true, false, false);
+            init_pos_mot();
+            marche_avant_s(-2.0, true, true, true, false, false);
         }
         
         /*
@@ -223,7 +178,7 @@ int main(void)
 
         if((get_selector()==14))
         {
-        	uint8_t compteur = 0;
+   /*     	uint8_t compteur = 0;
         	next_balise();
         	compteur = detect_recup(compteur);
         	next_balise();
@@ -241,56 +196,7 @@ int main(void)
         	compteur = detect_eject(compteur);
             next_balise();
             compteur = detect_eject(compteur);
-        	retour_base();
-        }
-
-
-        /*
-        *       Si le colis est 
-        *
-        *
-        */
-         if((get_selector()==14))
-        {
-            uint8_t nb_colis = 0;
-            uint8_t nb_passage = 1; //nombre de stations (ici 2 car rouge et bleu)
-            while((nb_passage<=2)&&(nb_colis<3))
-            {
-                nb_passage++;
-                next_balise();
-                nb_colis=detect_recup(nb_colis);
-            }
-            //sortie de la zone de balises
-            marche_avant_s(5, true, false, true, true, false);
-            balise_to_route(true);
-            init_pos_mot();
-            marche_avant_s(15, false, false, true, false, false);
-            init_pos_mot();
-            balise_to_route(false);
-            init_pos_mot();
-            //entree dans la zone de balises
-            marche_avant_s(50.0,false,true,true,true,true);
-            nb_passage=1;
-            while((nb_passage<=2)&&(nb_colis>2))
-            {
-                nb_passage++;
-                nb_colis=detect_eject(nb_colis);
-                next_balise();
-            }
-            if(nb_passage==0)
-            {
-                init_pos_mot();
-                rotation_s(180.0);
-                while(nb_passage<=2)
-                {
-                    nb_passage++;
-                    next_balise();
-                }
-            }
-            else
-                retour_base();
-
-            chThdSleepMilliseconds(5000);
+        	retour_base(); */
         }
 
 
