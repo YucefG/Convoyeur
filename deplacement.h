@@ -12,6 +12,7 @@
 #define SEUIL_VIT_NUL	  				40
 #define DELTA_T_MS						5	
 #define DELTA_T_S						0.005	
+#define SEUIL 							5.0f
 
 
 #define MARGE_POUSSEE					80
@@ -45,12 +46,12 @@ void marche_avant_s(float objectif, bool demarrage_s, bool freinage_s, bool char
 void rotation_s(float angle);
 void tourner(int16_t speed);
 void marche_avant(int16_t speed);
-void detect_eject(uint8_t comptage);
+uint8_t detect_eject(uint8_t comptage);
 uint8_t detect_recup(uint8_t compteur);
 void axage(void);
 void re_axage(void);
-void next_balise();
-void retour_base(void)
+void next_balise(void);
+void retour_base(void);
 void balise_to_route(bool balise_a_route);
 
 

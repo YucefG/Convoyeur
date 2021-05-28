@@ -149,12 +149,12 @@ int main(void)
                 //tests: 
                 //marche avant avec accel et frein controles
 
-            	detect_recup();
+      //      	detect_recup();
 
                 init_vitesse_mot();
                 init_pos_mot();
                 marche_avant_s(20.0, true, true, true, false, true);
-                detect_eject();
+    //            detect_eject();
 
                 init_vitesse_mot();
                 init_pos_mot();
@@ -204,23 +204,13 @@ int main(void)
         if(get_selector()==15)
         {
             
-            rotation_s(180.0);
-            init_vitesse_mot();
+            balise_to_route(true);
             init_pos_mot();
-            chThdSleepMilliseconds(3000);
-            rotation_s(180.0);
-            init_vitesse_mot();
+            marche_avant_s(30, false, false, true, false, false);
             init_pos_mot();
-            chThdSleepMilliseconds(3000);
-
-             rotation_s(360.0);
-            init_vitesse_mot();
+            balise_to_route(false);
             init_pos_mot();
-            chThdSleepMilliseconds(3000);
-            rotation_s(-360.0);
-            init_vitesse_mot();
-            init_pos_mot();
-            chThdSleepMilliseconds(3000);
+            marche_avant_s(50.0,false,true,true,true,true);
 
         }
         
@@ -235,16 +225,75 @@ int main(void)
         {
         	uint8_t compteur = 0;
         	next_balise();
-        	detect_recup(compteur)
+        	compteur = detect_recup(compteur);
         	next_balise();
-        	detect_eject(detect_recup());
+            compteur = detect_recup(compteur);
+            //sortie de la zone de balises
+            marche_avant_s(5, true, false, true, true, false);
+            balise_to_route(true);
+            init_pos_mot();
+            marche_avant_s(15, false, false, true, false, false);
+            init_pos_mot();
+            balise_to_route(false);
+            init_pos_mot();
+            //entree dans la zone de balises
+            marche_avant_s(50.0,false,true,true,true,true);
+        	compteur = detect_eject(compteur);
+            next_balise();
+            compteur = detect_eject(compteur);
         	retour_base();
-        	next_balise();
-        	detect_recup(compteur)
-        	next_balise();
-        	detect_eject(detect_recup());
-          	retour_base();
         }
+
+
+        /*
+        *       Si le colis est 
+        *
+        *
+        */
+         if((get_selector()==14))
+        {
+            uint8_t nb_colis = 0;
+            uint8_t nb_passage = 1; //nombre de stations (ici 2 car rouge et bleu)
+            while((nb_passage<=2)&&(nb_colis<3))
+            {
+                nb_passage++;
+                next_balise();
+                nb_colis=detect_recup(nb_colis);
+            }
+            //sortie de la zone de balises
+            marche_avant_s(5, true, false, true, true, false);
+            balise_to_route(true);
+            init_pos_mot();
+            marche_avant_s(15, false, false, true, false, false);
+            init_pos_mot();
+            balise_to_route(false);
+            init_pos_mot();
+            //entree dans la zone de balises
+            marche_avant_s(50.0,false,true,true,true,true);
+            nb_passage=1;
+            while((nb_passage<=2)&&(nb_colis>2))
+            {
+                nb_passage++;
+                nb_colis=detect_eject(nb_colis);
+                next_balise();
+            }
+            if(nb_passage==0)
+            {
+                init_pos_mot();
+                rotation_s(180.0);
+                while(nb_passage<=2)
+                {
+                    nb_passage++;
+                    next_balise();
+                }
+            }
+            else
+                retour_base();
+
+            chThdSleepMilliseconds(5000);
+        }
+
+
 
 
     	else
