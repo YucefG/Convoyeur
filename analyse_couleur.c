@@ -3,36 +3,17 @@
 #include "camera/dcmi_camera.h"
 #include <chprintf.h>
 #include <usbcfg.h>
-#include <main.h>
 #include <camera/po8030.h>
+
+#include <main.h>
 #include <analyse_couleur.h>
 
-#define IMAGE_BUFFER_SIZE		640
-#define SEUIL					120
 
-
+//Moyenne des pixels dans le rouge
 static uint16_t moyenne_r = 0;
-static uint16_t moyenne_b = 0;
-static uint16_t moyenne_v = 0;
-
 //Semaphore
 static BSEMAPHORE_DECL(image_ready_sem, TRUE);
 
-
-
-
-// Fonction qui fait la moyenne de la couleur obtenue
-uint32_t moyenne_ligne(uint8_t *buffer)
-{
-
-	uint32_t mean = 0;
-
-	for(uint16_t i = 0 ; i < IMAGE_BUFFER_SIZE ; i++)
-	{
-		mean += buffer[i];
-	}
-	return mean /= IMAGE_BUFFER_SIZE;
-}
 
 // Thread deja codee pour la capture d'une image
 static THD_WORKING_AREA(waCaptureImage, 256);
@@ -47,18 +28,18 @@ static THD_FUNCTION(CaptureImage, arg){
 	dcmi_set_capture_mode(CAPTURE_ONE_SHOT);
 	dcmi_prepare();
 
-    while(1){
+    while(WHILE_INFINI){
         //starts a capture
 		dcmi_capture_start();
-		//waits for the capture to be done
+		//waits for the capture to be dones
 		wait_image_ready();
 		//signals an image has been captured
 		chBSemSignal(&image_ready_sem);
     }
 }
 
-// Thread pour enregistrer les valeurs du rouge et bleu
-static THD_WORKING_AREA(waProcessImage, 3000);
+// Thread pour enregistrer les valeurs du rouge
+static THD_WORKING_AREA(waProcessImage, 1024);
 static THD_FUNCTION(ProcessImage, arg){
 
     chRegSetThreadName(__FUNCTION__);
@@ -66,50 +47,44 @@ static THD_FUNCTION(ProcessImage, arg){
 
 	uint8_t *img_buff_ptr;
 	uint8_t image_r[IMAGE_BUFFER_SIZE] = {0};	//tableau pour la couleur rouge
-	uint8_t image_b[IMAGE_BUFFER_SIZE] = {0};	//tableau pour la couleur bleue
-	uint8_t image_v[IMAGE_BUFFER_SIZE] = {0};	//tableau pour la couleur verte
-	uint8_t buffer1 = 0;
-	uint8_t buffer2 = 0;
-    while(1){
+
+    while(WHILE_INFINI)
+    {
     	//waits until an image has been captured
         chBSemWait(&image_ready_sem);
 		//gets the pointer to the array filled with the last image in RGB565
 		img_buff_ptr = dcmi_get_last_image_ptr();
 
-		for(uint16_t i=0; i<2*IMAGE_BUFFER_SIZE; i+=2)
+		for(uint16_t i=0; i<RATIO_8B_16B*IMAGE_BUFFER_SIZE; i+=RATIO_8B_16B)
 		{
-			image_b[i/2] = (uint8_t)img_buff_ptr[i+1]&0b00011111; //bleu
-			image_r[i/2] = (uint8_t)img_buff_ptr[i]&0xF8; //rouge
+			image_r[i/RATIO_8B_16B] = (uint8_t)img_buff_ptr[i]&MASQUE_ROUGE; //rouge
 		}
-		for(uint16_t i=0; i<2*IMAGE_BUFFER_SIZE; i+=2)
-		{
-		buffer1 = ((uint8_t)img_buff_ptr[i]&0b00000111)<<5;
-		buffer2 = ((uint8_t)img_buff_ptr[i+1]&0b11100000)>>5;
-		image_v[i/2] = buffer1|buffer2; //vert
-
-		}
-
 		moyenne_r = moyenne_ligne(image_r);
-		moyenne_b = moyenne_ligne(image_b);
-		moyenne_v = moyenne_ligne(image_v);
-
-	//	chprintf((BaseSequentialStream *)&SD3, "  Moyenne rouge: %u  ", moyenne_r);
-	//	chprintf((BaseSequentialStream *)&SD3, "  Moyenne bleue: %u  ", moyenne_b);
-	//	chprintf((BaseSequentialStream *)&SD3, "  Moyenne vert: %u  ", moyenne_v);
-    }
+		chprintf((BaseSequentialStream *)&SD3, "   %u   ", moyenne_r );
+	}
 }
 
-
-//Fonction qui detecte le rouge
-bool detec_rouge(void)
+// Fonction qui fait la moyenne des pixels obtenus
+uint32_t moyenne_ligne(uint8_t *buffer)
 {
-	/*Si objet est de couleur bleu ou autre --> retour a la base
-	 * //la valeur du seuil qui distingue le rouge
-	 *  des autres couleurs a ete choisie de maniere empirique */
-	if(moyenne_r < SEUIL )
+	uint32_t mean = 0;
+	for(uint16_t i = 0 ; i < IMAGE_BUFFER_SIZE ; i++)
+	{
+		mean += buffer[i];
+	}
+	return mean /= IMAGE_BUFFER_SIZE;
+}
+
+/*
+* 		Return true si objet rouge en face de l'epuck,
+* 		selon un seuil arbitraire. Sinon, retourne false
+*  		 
+*/
+bool balise_rouge(void)
+{
+	if(moyenne_r<SEUIL_ROUGE)
 		return false;
 	else
-	//Si objet rouge -->continue tout droit jusqu'en dehors de l'arene
 		return true;
 }
 

@@ -85,9 +85,10 @@ int main(void)
     	{
             init_vitesse_mot();
             init_pos_mot();
-    //		lumiere_demarrage();
-            chThdSleepMilliseconds(1000);
-            chprintf((BaseSequentialStream *)&SD3, "%i", Distance_to_temps(30.0, ACCELERATION_MAX, DELTA_T_S));
+            recup_colis(balise_rouge());
+
+
+            chprintf((BaseSequentialStream *)&SD3, "co");
             jeu_de_lumiere();
 
     	}
@@ -102,49 +103,46 @@ int main(void)
             bool colis_a_deposer = true; 
             while(1)
             {
-                int16_t tics_retour = 0;
+                calibration_angle();
                 init_pos_mot();
 
                 next_balise();
 
-                tics_retour += right_motor_get_pos();
                 init_pos_mot();
+                //orientation devant le gobelet rouge
+                init_pos_mot();
+                rotation_s(-90.0);
+                chThdSleepMilliseconds(400);
+                init_pos_mot();
+                init_vitesse_mot();
                 //recuperation du colis unique
-                colis_a_deposer = recup_colis(true);
+                colis_a_deposer = recup_colis(balise_rouge());
                 init_pos_mot();
                 //sortie de la zone de recuperation
                 marche_avant_s(5, true, false, true, true, false);
-                tics_retour += right_motor_get_pos();
                 init_pos_mot();
 
                 //passage par portes plus eloignement des portes
                 next_porte(VITESSE_INTERM);
-                tics_retour += right_motor_get_pos();
                 init_pos_mot();
 
                 balise_to_route(true);
-                tics_retour += right_motor_get_pos();
                 init_pos_mot();
                 
                 marche_avant_s(5, false, false, true, false, false);
-                tics_retour += right_motor_get_pos();
                 init_pos_mot();
 
                 next_porte(MAX_VITESSE);
-                tics_retour += right_motor_get_pos();
                 init_pos_mot();
 
                 balise_to_route(false);
-                tics_retour += right_motor_get_pos();
                 init_pos_mot();
                 //sortie de l'autoroute
-                tics_retour += right_motor_get_pos();
                 init_pos_mot();
                 //entree dans la zone de balises
                 marche_avant_s(50.0,false,true,true,true,true);
-                tics_retour += right_motor_get_pos();
                 eject_colis(colis_a_deposer);
-                retour_base(tics_retour);
+                retour_base();
             }            
     	}
 
@@ -156,12 +154,7 @@ int main(void)
         */
         if(get_selector()==15)
         {
-            rotation_s(180.0);
-            init_pos_mot();
-            init_vitesse_mot();
-            rotation_s(180);
-            init_pos_mot();
-            init_vitesse_mot();
+            calibration_angle();
         }
         
         /*
@@ -200,7 +193,6 @@ int main(void)
     	else
     	{
     		// Mode static sans jeu de lumiere 
-    		lumiere_eteinte();
 			init_vitesse_mot();
     	}
     }

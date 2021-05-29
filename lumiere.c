@@ -7,8 +7,10 @@
 #include <motors.h>
 #include <chprintf.h>
 #include <selector.h>
+#include <lumiere.h>
 
-void lumiere_eteinte(void)
+
+void leds_OFF(void)
 {
 
 	palSetPad(GPIOD, GPIOD_LED1);
@@ -17,7 +19,7 @@ void lumiere_eteinte(void)
 	palSetPad(GPIOD, GPIOD_LED7);
 }
 
-void lumiere_allumee(void)
+void leds_ON(void)
 {
 
 	palClearPad(GPIOD, GPIOD_LED1);
@@ -26,99 +28,41 @@ void lumiere_allumee(void)
 	palClearPad(GPIOD, GPIOD_LED7);
 }
 
-
-void lumiere_clignote(void)
-{
-	palTogglePad(GPIOD, GPIOD_LED1);
-	palTogglePad(GPIOD, GPIOD_LED3);
-	palTogglePad(GPIOD, GPIOD_LED5);
-	palTogglePad(GPIOD, GPIOD_LED7);
-}
-
-void signal_fin(void)
-{
-	palClearPad(GPIOB, GPIOB_LED_BODY);
-	chThdSleepMilliseconds(300);
-	palSetPad(GPIOB, GPIOB_LED_BODY);
-	chThdSleepMilliseconds(300);
-	palClearPad(GPIOB, GPIOB_LED_BODY);
-	chThdSleepMilliseconds(300);
-	palSetPad(GPIOB, GPIOB_LED_BODY);
-	chThdSleepMilliseconds(300);
-	palClearPad(GPIOB, GPIOB_LED_BODY);
-}
-
-void check_compteur(uint8_t compteur)
-{
-	// afficher le nombre d'objet detecte avec led
-	if(compteur == 0)
-		{
-			lumiere_eteinte();
-		}
-
-	else if(compteur == 1)
-	{
-		palClearPad(GPIOD, GPIOD_LED1);
-
-	}
-	else if(compteur== 2)
-	{
-		palClearPad(GPIOD, GPIOD_LED1);
-		palClearPad(GPIOD, GPIOD_LED3);
-	}
-	else if(compteur == 3)
-	{
-		palClearPad(GPIOD, GPIOD_LED1);
-		palClearPad(GPIOD, GPIOD_LED3);
-		palClearPad(GPIOD, GPIOD_LED5);
-	}
-	else if(compteur ==4 )
-	{
-		palClearPad(GPIOD, GPIOD_LED1);
-		palClearPad(GPIOD, GPIOD_LED3);
-		palClearPad(GPIOD, GPIOD_LED5);
-		palClearPad(GPIOD, GPIOD_LED7);
-	}
-	else
-	{
-		lumiere_clignote();
-	}
-}
-
+// appelé au mode 0
 void jeu_de_lumiere(void)
 {
-	lumiere_eteinte();
+	leds_OFF();
 
-	chThdSleepMilliseconds(100);// Regler la rapidite du jeu de lumiere
+	chThdSleepMilliseconds(TEMPS_COURT);// Regler la rapidite du jeu de lumiere
 
 	palClearPad(GPIOD, GPIOD_LED1);
 	palClearPad(GPIOD, GPIOD_LED5);
 
-	chThdSleepMilliseconds(100);// Regler la rapidite du jeu de lumiere
+	chThdSleepMilliseconds(TEMPS_COURT);// Regler la rapidite du jeu de lumiere
 
     palSetPad(GPIOD, GPIOD_LED1);
     palSetPad(GPIOD, GPIOD_LED5);
 
-    chThdSleepMilliseconds(100);
+    chThdSleepMilliseconds(TEMPS_COURT);
 
 	palClearPad(GPIOD, GPIOD_LED3);
 	palClearPad(GPIOD, GPIOD_LED7);
 
-	chThdSleepMilliseconds(100);
+	chThdSleepMilliseconds(TEMPS_COURT);
 
     palSetPad(GPIOD, GPIOD_LED3);
     palSetPad(GPIOD, GPIOD_LED7);
 
     palClearPad(GPIOB, GPIOB_LED_BODY);
-    chThdSleepMilliseconds(200);
+    chThdSleepMilliseconds(TEMPS_LONG);
 
      palSetPad(GPIOB, GPIOB_LED_BODY);
-     lumiere_allumee();
+     leds_ON();
 
-    chThdSleepMilliseconds(200);
-   	lumiere_eteinte();
+    chThdSleepMilliseconds(TEMPS_LONG);
+   	leds_OFF();
 
    	palClearPad(GPIOB, GPIOB_LED_BODY);
 
-    lumiere_allumee();
+    leds_OFF();
  }

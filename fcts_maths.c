@@ -8,9 +8,11 @@
 #include <chprintf.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <arm_math.h>
+
+#include <fcts_maths.h>
 #include <deplacement.h>
 #include <detection.h>
-#include <arm_math.h>
 
 
 
@@ -19,24 +21,10 @@ float StepsToCm(int32_t nbSteps)
 	return (float)((float)(nbSteps*PERIM_ROUE_CM)/(float)(TICS_1_TOUR));
 }
 
-float MmToCm(uint16_t ValeurMm)
-{
-	return (float)((float)ValeurMm)/((float)DIX);
-}
-
 int32_t CmToSteps(float ValeurCm)
 {
 	return (int32_t)((ValeurCm*(float)TICS_1_TOUR)/PERIM_ROUE_CM);
 }
-
-int16_t Distance_to_temps(float objectif, float acceleration, float delta_t)
-{
-	float temps =0;
-	temps = sqrtf((2.0*(float)(CmToSteps(objectif)))/acceleration);
-    chprintf((BaseSequentialStream *)&SD3, "  %f  ", temps);
-
-	return (uint16_t)(temps/delta_t);
-} 
 
 float angle_to_arc(float angle, float diametre)
 {
