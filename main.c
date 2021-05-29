@@ -88,7 +88,7 @@ int main(void)
     //		lumiere_demarrage();
             chThdSleepMilliseconds(1000);
             chprintf((BaseSequentialStream *)&SD3, "%i", Distance_to_temps(30.0, ACCELERATION_MAX, DELTA_T_S));
-            signal_fin();
+            jeu_de_lumiere();
 
     	}
         
@@ -156,17 +156,12 @@ int main(void)
         */
         if(get_selector()==15)
         {
-            marche_avant_s(10.0, true, true, true, false, false);
+            rotation_s(180.0);
             init_pos_mot();
-            marche_avant_s(-10.0, true, true, true, false, false);
+            init_vitesse_mot();
+            rotation_s(180);
             init_pos_mot();
-            marche_avant_s(5.0, true, true, true, false, false);
-            init_pos_mot();
-            marche_avant_s(-5.0, true, true, true, false, false);
-            init_pos_mot();
-            marche_avant_s(2.0, true, true, true, false, false);
-            init_pos_mot();
-            marche_avant_s(-2.0, true, true, true, false, false);
+            init_vitesse_mot();
         }
         
         /*

@@ -15,8 +15,17 @@ void lumiere_eteinte(void)
 	palSetPad(GPIOD, GPIOD_LED3);
 	palSetPad(GPIOD, GPIOD_LED5);
 	palSetPad(GPIOD, GPIOD_LED7);
-
 }
+
+void lumiere_allumee(void)
+{
+
+	palClearPad(GPIOD, GPIOD_LED1);
+	palClearPad(GPIOD, GPIOD_LED3);
+	palClearPad(GPIOD, GPIOD_LED5);
+	palClearPad(GPIOD, GPIOD_LED7);
+}
+
 
 void lumiere_clignote(void)
 {
@@ -78,13 +87,17 @@ void check_compteur(uint8_t compteur)
 
 void jeu_de_lumiere(void)
 {
+	lumiere_eteinte();
+
+	chThdSleepMilliseconds(100);// Regler la rapidite du jeu de lumiere
+
 	palClearPad(GPIOD, GPIOD_LED1);
 	palClearPad(GPIOD, GPIOD_LED5);
 
 	chThdSleepMilliseconds(100);// Regler la rapidite du jeu de lumiere
 
     palSetPad(GPIOD, GPIOD_LED1);
-    palClearPad(GPIOD, GPIOD_LED5);
+    palSetPad(GPIOD, GPIOD_LED5);
 
     chThdSleepMilliseconds(100);
 
@@ -94,7 +107,7 @@ void jeu_de_lumiere(void)
 	chThdSleepMilliseconds(100);
 
     palSetPad(GPIOD, GPIOD_LED3);
-    palClearPad(GPIOD, GPIOD_LED5);
+    palSetPad(GPIOD, GPIOD_LED7);
 
     palClearPad(GPIOB, GPIOB_LED_BODY);
     chThdSleepMilliseconds(200);
@@ -107,6 +120,5 @@ void jeu_de_lumiere(void)
 
    	palClearPad(GPIOB, GPIOB_LED_BODY);
 
-     palClearPad(GPIOD, GPIOD_LED1);
-     lumiere_allumee();
+    lumiere_allumee();
  }

@@ -279,6 +279,8 @@ void rotation_s(float angle)
 		chThdSleepMilliseconds(4);
 	}
 	init_vitesse_mot();
+	chThdSleepMilliseconds(200);
+
 	//chprintf((BaseSequentialStream *)&SD3, "   direction: %i  ",sens);
 	//chprintf((BaseSequentialStream *)&SD3, "   tics rampe: %i  ",tics_rampe);
 	//chprintf((BaseSequentialStream *)&SD3, "   tics1: %i  ",tics1);
@@ -314,11 +316,15 @@ void eject_colis(bool b_eject)
 	chThdSleepMilliseconds(100);
 	if (b_eject)
 	{
+	/*	init_pos_mot();
+		rotation_s(180.0); */
 		init_pos_mot();
-		rotation_s(180.0);
+		rotation_s(90.0);
 		init_pos_mot();
+		rotation_s(90.0);
+		init_pos_mot();
+		
         marche_avant_s(60.0, true, false, false, false, false);
-
         //permet de revenir d'exactement la bonne distance
     	int16_t memoire = right_motor_get_pos();
     	float memoire_cm = StepsToCm(memoire);
@@ -326,10 +332,12 @@ void eject_colis(bool b_eject)
 
         init_vitesse_mot();
         chThdSleepMilliseconds(100);
+        playMelody(MARIO_FLAG, ML_FORCE_CHANGE, NULL);
         marche_avant_s(-memoire_cm, true, true, true, false, false);
         init_pos_mot();
 
         //2e coup
+        
 		marche_avant_s(60.0, true, false, false, false, false);
 
         //permet de revenir d'exactement la bonne distance
@@ -421,8 +429,12 @@ bool recup_colis(bool b_recup)
 	//recupere le colis
 	if(b_recup)
 	{
+		/*	init_pos_mot();
+		rotation_s(180.0); */
 		init_pos_mot();
-		rotation_s(180.0);
+		rotation_s(90.0);
+		init_pos_mot();
+		rotation_s(90.0);
 		init_pos_mot();
 		marche_avant_s(40.0, true, false, false, true, false);
         //permet de revenir d'exactement la bonne distance
@@ -562,6 +574,7 @@ void next_balise(void)
 		init_pos_mot();
 		marche_avant_s(50.0,false,true,true,true,true);
 		init_vitesse_mot();
+
 }
 
 void next_porte(int16_t speed)
@@ -585,11 +598,17 @@ void retour_base(int16_t tics_retour)
 	marche_avant_s(-10.0,  true, true, true, false,false);
 	init_pos_mot();
 	init_vitesse_mot();
-	rotation_s(180.0);
+	/*	init_pos_mot();
+		rotation_s(180.0); */
+	init_pos_mot();
+	rotation_s(90.0);
+	init_pos_mot();
+	rotation_s(90.0);
 	init_pos_mot();
 	init_vitesse_mot();
-	marche_avant_s(StepsToCm(tics_retour),true,true,false,false,false);
-	init_vitesse_mot();
+	//marche_avant_s(StepsToCm(tics_retour),true,true,false,false,false);
+	marche_avant_s(800.0,true,true,false,false,false);
+	init_pos_mot();
 	rotation_s(360.0);
 	init_pos_mot();
 }
