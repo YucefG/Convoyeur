@@ -453,21 +453,25 @@ void retour_base(void)
 {
 	init_pos_mot();
 	init_vitesse_mot();
-	marche_avant_s(10.0, DEMAR_DOUX,FREIN_DOUX,CHARGE,AUTOROUTE,PORTE_FALSE);
+	marche_avant_s(DIST_MAX, DEMAR_DOUX, FREIN_DOUX, PAS_CHARGE, ZONE_BORNES, PORTE_FALSE);
 	init_pos_mot();
 	init_vitesse_mot();
-	marche_avant_s(-10.0, DEMAR_DOUX, FREIN_DOUX, CHARGE, AUTOROUTE,PORTE_FALSE);
+	axage();
 	init_pos_mot();
 	init_vitesse_mot();
-	/*	init_pos_mot();
-		rotation_s(180.0); */
-	init_pos_mot();
-	rotation_s(ANGLE180);
+	rotation_s(-ANGLE90);
 	init_pos_mot();
 	init_vitesse_mot();
-	//marche_avant_s(StepsToCm(tics_retour),true,true,false,false,false);
-	marche_avant_s(DIST_MAX, DEMAR_DOUX,FREIN_DOUX,PAS_CHARGE,AUTOROUTE,PORTE_FALSE);
+	marche_avant_s(DIST_MAX, DEMAR_DOUX, FREIN_DOUX, PAS_CHARGE, ZONE_BORNES, PORTE_FALSE);
 	init_pos_mot();
+	init_vitesse_mot();
+	rotation_s(-ANGLE90);
+	marche_avant_s(DIST_MAX, DEMAR_DOUX, FREIN_DOUX, PAS_CHARGE, ZONE_BORNES, PORTE_FALSE);
+	init_pos_mot();
+	init_vitesse_mot();
+	rotation_s(-ANGLE90);
+	marche_avant_s(DIST_MAX, DEMAR_DOUX, FREIN_DOUX, PAS_CHARGE, ZONE_BORNES, PORTE_FALSE);
+	jeu_de_lumiere();
 }
 
 /*
