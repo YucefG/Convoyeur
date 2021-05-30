@@ -1,7 +1,6 @@
 #include "ch.h"
 #include "hal.h"
 #include "camera/dcmi_camera.h"
-#include <chprintf.h>
 #include <usbcfg.h>
 #include <camera/po8030.h>
 
@@ -46,7 +45,8 @@ static THD_FUNCTION(ProcessImage, arg){
     (void)arg;
 
 	uint8_t *img_buff_ptr;
-	uint8_t image_r[IMAGE_BUFFER_SIZE] = {0};	//tableau pour la couleur rouge
+	//tableau pour la couleur rouge
+	uint8_t image_r[IMAGE_BUFFER_SIZE] = {0};	
 
     while(WHILE_INFINI)
     {
@@ -57,10 +57,9 @@ static THD_FUNCTION(ProcessImage, arg){
 
 		for(uint16_t i=0; i<RATIO_8B_16B*IMAGE_BUFFER_SIZE; i+=RATIO_8B_16B)
 		{
-			image_r[i/RATIO_8B_16B] = (uint8_t)img_buff_ptr[i]&MASQUE_ROUGE; //rouge
+			image_r[i/RATIO_8B_16B] = (uint8_t)img_buff_ptr[i]&MASQUE_ROUGE; 
 		}
 		moyenne_r = moyenne_ligne(image_r);
-		chprintf((BaseSequentialStream *)&SD3, "   %u   ", moyenne_r );
 	}
 }
 

@@ -6,61 +6,36 @@
 #include "hal.h"
 #include "memory_protection.h"
 #include <usbcfg.h>
-#include <main.h>
 #include <chprintf.h>
 #include <motors.h>
-#include <audio/microphone.h>
 #include <selector.h>
 #include <sensors/proximity.h>
 #include <audio/play_melody.h>
 #include <audio/audio_thread.h>
 #include <arm_math.h>
+
+#include <main.h>
 #include <deplacement.h>
 #include <fcts_maths.h>
 #include <detection.h>
 #include <analyse_couleur.h>
 #include <lumiere.h>
 
-
-
-// Define pour ne pas avoir de magic number dans le code
-#define DEUX_CENTS  200
-
 // On initialise ici le bus afin de pouvoir utiliser les capteurs de proximite "proximity"
 messagebus_t bus;
 MUTEX_DECL(bus_lock);
 CONDVAR_DECL(bus_condvar);
 
-// Fonction qui nous a permis d'afficher sur REALterm  les chprintf du robot
-static void serial_start(void)
-{
-	static SerialConfig ser_cfg = {
-	    115200,
-	    0,
-	    0,
-	    0,
-	};
-
-	sdStart(&SD3, &ser_cfg); // UART3.
-}
-
 int main(void)
 {
     halInit();
     chSysInit();
-    mpu_init();
+   // mpu_init();
 
     messagebus_init(&bus, &bus_lock, &bus_condvar);
 
-
-    //Start la communication en serie
-    serial_start();
-    //Start la communication USB
-    usb_start();
     //Initialsation des moteurs pas a pas du robot
     motors_init();
-    //Start le capteur longue distance
-	VL53L0X_start();
 	//Start des capteurs de proximite
 	proximity_start();
 	//Start la camera du robot
@@ -78,118 +53,95 @@ int main(void)
 
 
     /* Boucle infinie */
-    while (1) {
-
-    	//Selecteur == 0 : mode static + jeu de LEDs
-    	if(get_selector()==0)
+    while (WHILE_INFINI) 
+    {	
+        /* 
+        *   Si selector == 0 : moteurs à l'arret + jeu de lumieres
+        */
+    	if(get_selector()==SELECTEUR0)
     	{
             init_vitesse_mot();
             init_pos_mot();
-            recup_colis(balise_rouge());
-
-
-            chprintf((BaseSequentialStream *)&SD3, "co");
             jeu_de_lumiere();
-
     	}
         
-    	
-
-    	if(get_selector()==1)
+        /* 
+        *   Si selector == 1 : fonction principale:
+        *   tant que colis_a_deposer == true, on refait la fonction principale:
+        *   detecter la 1ere balise rouge, lancer la fonction recup_colis,
+        *   prendre l'autoroute, deposer le colis, apres avoir détecté une 2e balise 
+        *   rouge, puis revenir a la base de depart avec retour_base. 
+        */
+    	if(get_selector()==SELECTEUR1)
     	{
-            
-
-            //tant que le robot n'est pas bloqué
-            bool colis_a_deposer = true; 
-            while(1)
+            bool colis_a_deposer = COLIS_RECUP; 
+            //tant que le robot n'est pas bloqué sur son chemin pour recup le colis
+            while(colis_a_deposer==COLIS_RECUP)
             {
-                calibration_angle();
                 init_pos_mot();
-
+                //avancer jusq'a detection d'une balise sur la gauche
                 next_balise();
+                init_pos_mot();
 
+                //orientation devant le gobelet
                 init_pos_mot();
-                //orientation devant le gobelet rouge
-                init_pos_mot();
-                rotation_s(-90.0);
-                chThdSleepMilliseconds(400);
+                rotation_s(-ANGLE90);
+                chThdSleepMilliseconds(PAUSE400);
                 init_pos_mot();
                 init_vitesse_mot();
-                //recuperation du colis unique
+
+                /*
+                *   si balise est rouge, recup du colis: si colis recup, colis_a_deposer == true
+                *   sinon colis_a_deposer == false
+                */
                 colis_a_deposer = recup_colis(balise_rouge());
                 init_pos_mot();
+
                 //sortie de la zone de recuperation
-                marche_avant_s(5, true, false, true, true, false);
+                marche_avant_s(SORTIE_BALISE, DEMAR_DOUX, FREIN_CHOC, CHARGE, ZONE_BORNES, PORTE_FALSE);
                 init_pos_mot();
 
-                //passage par portes plus eloignement des portes
+                //vitesse constante jusqu'a portes
                 next_porte(VITESSE_INTERM);
                 init_pos_mot();
 
-                balise_to_route(true);
-                init_pos_mot();
-                
-                marche_avant_s(5, false, false, true, false, false);
+                //acceleration de VIT_INTERMEDIAIRE a MAX_VITESSE
+                balise_to_route(INTERM_TO_MAX);
                 init_pos_mot();
 
+                //eloignement de la porte
+                marche_avant_s(SORTIE_BALISE, DEMAR_CHOC, FREIN_CHOC, CHARGE, AUTOROUTE, PORTE_FALSE);
+                init_pos_mot();
+
+                //vitesse constante jusqu'a portes
                 next_porte(MAX_VITESSE);
                 init_pos_mot();
 
-                balise_to_route(false);
+                //acceleration de MAX_VITESSE a VIT_INTERMEDIAIRE
+                balise_to_route(MAX_TO_INTERM);
                 init_pos_mot();
+
                 //sortie de l'autoroute
                 init_pos_mot();
+
                 //entree dans la zone de balises
-                marche_avant_s(50.0,false,true,true,true,true);
+                marche_avant_s(DIST_MAX,DEMAR_CHOC,FREIN_DOUX,CHARGE,ZONE_BORNES,PORTE_TRUE);
+                init_pos_mot();
+
+                //si colis_a_deposer == true, eject du colis, sinon pas d'eject
                 eject_colis(colis_a_deposer);
+
+                //retour a la base
+                init_pos_mot();
                 retour_base();
-            }            
+            } 
+            while(WHILE_INFINI)
+            {
+                init_vitesse_mot();
+                jeu_de_lumiere();
+            }           
     	}
-
-        /*
-        *  Selecteur == 15 :
-        *  
-        * 
-        *   
-        */
-        if(get_selector()==15)
-        {
-            calibration_angle();
-        }
-        
-        /*
-        *  Selecteur == 14 :
-        *  
-        *  
-        *  
-        */
-
-        if((get_selector()==14))
-        {
-   /*     	uint8_t compteur = 0;
-        	next_balise();
-        	compteur = detect_recup(compteur);
-        	next_balise();
-            compteur = detect_recup(compteur);
-            //sortie de la zone de balises
-            marche_avant_s(5, true, false, true, true, false);
-            balise_to_route(true);
-            init_pos_mot();
-            marche_avant_s(15, false, false, true, false, false);
-            init_pos_mot();
-            balise_to_route(false);
-            init_pos_mot();
-            //entree dans la zone de balises
-            marche_avant_s(50.0,false,true,true,true,true);
-        	compteur = detect_eject(compteur);
-            next_balise();
-            compteur = detect_eject(compteur);
-        	retour_base(); */
-        }
-
-
-
-
+ 
     	else
     	{
     		// Mode static sans jeu de lumiere 

@@ -19,9 +19,10 @@
 
 
 
-/* Si les capteurs de proximite situes a un angle de 17° ont atteint la limite de collision
-* alors la fonction return true pour arreter le robot
-*/
+/* 
+ *	Si les capteurs de proximite situes a un angle de 17° ont atteint la limite de collision
+ * 	alors la fonction return false pour arreter le robot
+ */
 _Bool prox_distance(bool charge)
 {
 	if (charge==PAS_CHARGE)
@@ -36,9 +37,10 @@ _Bool prox_distance(bool charge)
 		return RIEN_FRONT_DETECTE;
 }
 
-/* Si les capteurs de proximite situes a un angle de 45° ont detecte des portes
- * alors la fonction return true
-*/
+/* 
+ *	Si les capteurs de proximite situes a un angle de 90° ont detecte des portes
+ * 	alors la fonction return false
+ */
 bool detection_balise(bool b_balise)
 {
 	if(b_balise)
@@ -52,7 +54,11 @@ bool detection_balise(bool b_balise)
 		return BALISE_NON_DETECTE;
 }
 
-//b_portes est true si on fait attention aux portes, false sinon
+/* 
+ *	b_portes est true si on fait attention aux portes, false sinon
+ * 	si b_portes: true, alors si les deux capteurs a 90 deg sont actifs au meme temps, 
+ *	on return true, false sinon.  
+ */
 bool detection_porte(bool b_portes)
 {
 	if(b_portes)
